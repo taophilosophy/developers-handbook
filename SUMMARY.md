@@ -18,7 +18,7 @@
 
 ## 第二部分：进程间通信&#x20;
 
-* [第 7 章 Socket](di-er-bu-fen-jin-cheng-jian-tong-xin/di-7-zhang-socket.md)
+* [第 7 章 套接字](di-er-bu-fen-jin-cheng-jian-tong-xin/di-7-zhang-socket.md)
 * [第 8 章 IPv6 内部实现](di-er-bu-fen-jin-cheng-jian-tong-xin/di-8-zhang-ipv6-nei-bu-shi-xian.md)
 
 ## 第三部分 内核
