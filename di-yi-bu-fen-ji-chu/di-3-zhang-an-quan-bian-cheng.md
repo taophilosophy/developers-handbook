@@ -101,11 +101,11 @@ chroot() 系统调用的行为可以通过 kern.chroot_allow_open_directories sy
 
 ### 3.5.1. FreeBSD 的jail功能
 
-“Jail”的概念是在 chroot() 的基础上进行扩展，通过限制超级用户的权限来创建一个真正的“虚拟服务器”。一旦设置了监狱，所有的网络通信必须通过指定的 IP 地址进行，而在这个jail中，“root 权限”的权力受到严格限制。
+“Jail”的概念是在 chroot() 的基础上进行扩展，通过限制超级用户的权限来创建一个真正的“虚拟服务器”。一旦设置了 jail ，所有的网络通信必须通过指定的 IP 地址进行，而在这个jail中，“root 权限”的权力受到严格限制。
 
-在监狱中，通过 suser() 调用测试内核中超级用户权限的任何尝试都会失败。然而，一些对 suser() 的调用已更改为一个新的接口 suser_xxx() 。这个函数负责识别或拒绝对被监禁进程的超级用户权限的访问。
+在 jail 中，通过 suser() 调用测试内核中超级用户权限的任何尝试都会失败。然而，一些对 suser() 的调用已更改为一个新的接口 suser_xxx() 。这个函数负责识别或拒绝对被 jail 进程的超级用户权限的访问。
 
-在受监禁的环境中，超级用户进程有权力：
+在受 jail 的环境中，超级用户进程有权力：
 
 * 使用 setuid , seteuid , setgid , setegid , setgroups , setreuid , setregid , setlogin 操纵凭据
 * 使用 setrlimit 设置资源限制
