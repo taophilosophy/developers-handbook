@@ -1,219 +1,220 @@
 # 第 7 章 套接字
 
-## 7.1. 概要
+## 7.1. 概述
 
-BSD sockets 将进程间通信提升到一个新水平。通信进程不再需要在同一台机器上运行。它们仍然可以，但不一定要这样。
+BSD socket 将进程间通信提升到了一个新的层次。通信的进程不再必须运行在同一台机器上。它们*可以*运行在同一台机器上，但不再是必须的。
 
-这些进程不仅无需在同一台机器上运行，它们也无需在同一操作系统下运行。多亏了 BSD sockets，您的 FreeBSD 软件可以与运行在 Macintosh®上的程序，运行在 Sun™工作站上的另一个程序，以及在 Windows® 2000 下运行的另一个程序平滑合作，它们都连接在基于以太网的局域网上。
+不仅如此，这些进程也不需要运行在相同的操作系统下。多亏了 BSD socket，你的 FreeBSD 软件可以顺利地与一台 Macintosh® 上运行的程序协作，与一台 Sun™ 工作站上的程序协作，甚至与一台运行 Windows® 2000 的程序协作，所有这些通过基于以太网的局域网连接在一起。
 
-但您的软件同样可以与在另一个建筑物内运行的进程合作，或者在另一个大陆上，潜艇内，或航天飞机内运行的进程合作。
+而你的软件同样可以与运行在另一栋楼、另一个大陆、甚至潜艇或航天飞机中的进程协作。
 
-它还可以与不属于计算机（至少不是严格意义上的计算机）的进程合作，例如打印机、数码相机、医疗设备等设备。几乎任何具有数字通信能力的设备。
+它也可以与不是计算机（至少不是严格意义上的计算机）中的进程协作，比如打印机、数码相机、医疗设备等设备中的进程。几乎任何能进行数字通信的东西。
 
 ## 7.2. 网络与多样性
 
-我们已经暗示了网络的多样性。许多不同的系统必须相互通信。而且它们必须说同一种语言。它们还必须以相同的方式理解这种语言。
+我们已经暗示过网络的*多样性*。许多不同的系统必须彼此通信。而它们必须讲相同的语言。它们还必须*以相同的方式理解*这种语言。
 
-人们常常认为肢体语言是普遍适用的。但事实并非如此。在我十几岁的时候，我父亲带我去了保加利亚。当时我们坐在索非亚的一个公园的桌子旁，一个小贩走过来想要卖给我们一些炒杏仁。
+人们常常以为*肢体语言*是通用的。但事实并非如此。在我十几岁的时候，我父亲带我去了保加利亚。我们在索非亚的一座公园里坐在一张桌边，一个小贩走近我们，试图卖我们一些烤杏仁。
 
-那时候我还没学到太多保加利亚语，所以，我没有说不，而是摇了摇头，这在全世界都被认为是“不”的肢体语言。小贩很快开始给我们端来了一些杏仁。
+那时我还没怎么学过保加利亚语，于是，我没有说“不”，而是左右摇头，这是“*不*”这个意思的“通用”肢体语言。结果小贩立刻开始给我们装杏仁。
 
-后来我想起在保加利亚，摇头意味着说“是”。我马上开始点头。小贩注意到了，拿走了他的杏仁，然后走开了。对于一个不了解情况的观察者来说，我的肢体语言并没有改变：我继续使用摇头和点头的语言。改变的是肢体语言的含义。起初，小贩和我解释同样的语言，却具有完全不同的意义。我必须调整我对那种语言的理解，以便让小贩理解。
+这时我才记起有人告诉过我，在保加利亚，摇头表示“*是*”。我赶紧改为上下点头。小贩注意到了，拿起杏仁，离开了。对一个不知情的旁观者来说，我的肢体语言没有变化：我继续摇头点头。变的是*肢体语言的含义*。起初，小贩和我对相同的语言作出了完全不同的解释。我必须调整自己对这种语言的解释，才能让小贩理解。
 
-与计算机相同：相同的符号可能具有不同，甚至完全相反的含义。因此，为了让两台计算机彼此理解，它们不仅必须就相同的语言达成一致，还必须就语言的相同解释达成一致。
+计算机之间也是如此：相同的符号可能具有不同，甚至完全相反的含义。因此，两个计算机要能互相理解，不仅要使用相同的*语言*，还要以相同的*方式解释*这种语言。
 
 ## 7.3. 协议
 
-虽然各种编程语言往往具有复杂的语法并使用许多多字母保留字（这使得它们易于人类程序员理解），但数据通信的语言往往非常简洁。它们通常不使用多字节字，而是经常使用单个位。这样做有一个非常令人信服的理由：当数据在计算机内部以接近光速的速度传输时，它在两台计算机之间传输时往往要慢得多。
+尽管各种编程语言通常具有复杂的语法，并使用许多多字母的保留字（这使得它们对程序员更易于理解），数据通信的语言通常非常简洁。它们不使用多字节的单词，而是经常使用单个的*比特*。这样做有一个非常令人信服的理由：虽然数据在计算机内部的传输速度接近光速，但在两台计算机之间的传输速度往往要慢得多。
 
-由于数据通信中使用的语言非常简洁，我们通常将其称为协议而不是语言。
+由于数据通信中使用的语言非常简洁，我们通常将其称为*协议*，而不是语言。
 
-当数据从一台计算机传输到另一台计算机时，它总是使用多个协议。这些协议是分层的。数据可以被比作洋葱的内部：你必须剥离几层“外皮”才能获得数据。这最好是用图片来说明：
+当数据从一台计算机传输到另一台计算机时，它总是使用多个协议。这些协议是*分层的*。数据可以比作洋葱的内部：你需要剥去几层“皮”才能获得数据。用一张图片来说明这一点会更好：
 
 ![layers](https://docs.freebsd.org/images/books/developers-handbook/layers.png)
 
-图 1. 协议层
+**图 1. 协议层**
 
-在这个例子中，我们正在尝试从通过以太网连接的网页中获取图像。
+在这个例子中，我们正在尝试从一个通过以太网连接的网页中获取一张图片。
 
-图像由原始数据组成，这只是我们的软件可以处理的一系列 RGB 值，即将其转换为图像并显示在我们的显示器上。
+图片由原始数据组成，原始数据只是一个 RGB 值的序列，我们的软件可以处理这些值，即将其转换为图像并显示在显示器上。
 
-可惜，我们的软件无法知道原始数据是如何组织的：它是一系列 RGB 值，还是一系列灰度强度，或者是 CMYK 编码的颜色？数据是否由 8 位量表示，或者它们的大小为 16 位，或者也许是 4 位？图像由多少行和列组成？某些像素应该是透明的吗？
+遗憾的是，我们的软件无法知道这些原始数据是如何组织的：它是 RGB 值的序列，还是灰度强度的序列，或者是 CMYK 编码的颜色？数据是用 8 位量表示，还是 16 位，或者是 4 位？图片由多少行和列组成？某些像素是否需要透明？
 
-我觉得你明白了吧…
+我想你已经明白了……
 
-为了告诉我们的软件如何处理原始数据，它被编码为 PNG 文件。它可以是 GIF，也可以是 JPEG，但它是 PNG。
+为了告诉我们的软件如何处理这些原始数据，它被编码为 PNG 文件。它也可以是 GIF 文件，或者 JPEG 文件，但它是 PNG。
 
-PNG 是一种协议。
+而 PNG 就是一个协议。
 
-在这一点上，我能听到你们中的一些人在喊叫，“不，它不是！它是一种文件格式！”
+在这个时候，我听到有些人喊道：“不，它不是！它是文件格式！”
 
-当然，它当然是一种文件格式。但从数据通信的角度来看，文件格式就是一种协议：文件结构是一种语言，一种简洁的语言，向我们的进程传达数据的组织方式。因此，它就是一种协议。
+当然，它是文件格式。但从数据通信的角度来看，文件格式就是协议：文件结构是一个*语言*，它简洁到极点，告诉我们的*进程*数据是如何组织的。因此，它是一个*协议*。
 
-遗憾的是，如果我们收到的只是 PNG 文件，我们的软件将面临一个严重的问题：它应该如何知道数据代表的是图像，而不是一些文本，或者可能是声音，或其他什么？其次，它应该如何知道图像是 PNG 格式，而不是 GIF，JPEG 或其他某种图像格式？
+然而，如果我们收到的只是 PNG 文件，我们的软件将面临一个严重的问题：它怎么知道数据表示的是图像，而不是某些文本，或者是音频，或者其他什么？其次，怎么知道图像是 PNG 格式而不是 GIF、JPEG 或其他图像格式？
 
-为了获取这些信息，我们正在使用另一种协议：HTTP。该协议可以准确告诉我们数据代表一幅镜像，并且使用 PNG 协议。它还可以告诉我们一些其他的东西，但让我们在这里专注于协议层面。
+为了获得这些信息，我们使用了另一个协议：HTTP。这个协议可以准确地告诉我们，数据表示的是图像，并且它使用的是 PNG 协议。它还可以告诉我们其他信息，但我们现在还是集中在协议层次上。
 
-所以，现在我们有一些数据包裹在 PNG 协议中，再包裹在 HTTP 协议中。我们如何从服务器获取它呢？
+所以，现在我们收到了一个包裹在 PNG 协议中的数据，再包裹在 HTTP 协议中。那我们是如何从服务器获得它的呢？
 
-通过 TCP/IP 在以太网上，就是这样。确实，这是另外三个协议。而不是继续从内到外讲述，我现在要谈论以太网，因为这样更容易解释其余部分。
+是通过 Ethernet 上的 TCP/IP 来的，实际上那是三个协议。为了更容易解释接下来的内容，我现在将重点讲解 Ethernet。
 
-以太网是一种连接局域网（LAN）中计算机的有趣系统。每台计算机都有一个网络接口卡（NIC），其中包含一个称为地址的独特的 48 位 ID。世界上没有两个以太网 NIC 具有相同的地址。
+以太网是一个有趣的局域网（LAN）计算机连接系统。每台计算机都有一个*网络接口卡*（NIC），该卡具有一个唯一的 48 位 ID，称为*地址*。世界上没有两台 Ethernet NIC 拥有相同的地址。
 
-这些 NIC 都彼此连接在一起。每当一台计算机想要与同一以太网 LAN 中的另一台计算机通信时，它会通过网络发送一条消息。每个 NIC 都会看到这条消息。但作为以太网协议的一部分，数据包含目标 NIC 的地址（以及其他内容）。因此，所有网络接口卡中只有一个会注意到它，其余的会忽略它。
+这些 NIC 彼此连接。当一台计算机想要与同一 Ethernet LAN 中的另一台计算机通信时，它会通过网络发送消息。每个 NIC 都能看到这条消息。但作为以太网*协议*的一部分，数据中包含了目标 NIC 的地址（以及其他信息）。因此，只有其中一块网络接口卡会注意到这条消息，其他的都会忽略它。
 
-但并非所有计算机都连接到同一网络。仅仅因为我们通过以太网接收到数据并不意味着它起源于我们自己的局域网。它可能来自我们的网络通过互联网连接的其他网络（甚至可能不是基于以太网的网络）。
+但并不是所有的计算机都连接在同一个网络上。仅仅因为我们通过以太网接收到数据，并不意味着它来自我们自己的局域网。它可能来自其他通过 Internet 连接的网络（可能并非基于以太网的网络）。
 
-所有数据都是使用 IP（即互联网协议）在互联网上传输的。它的基本作用是让我们知道数据是从世界上的哪里到达的，以及它应该去哪里。它不能保证我们会接收到数据，只能告诉我们如果接收到数据的话它是从哪里来的。
+所有数据通过互联网传输都使用 IP，即*互联网协议*。它的基本作用是告诉我们数据来自哪里，应该到达哪里。它不*保证*我们会收到数据，只是保证如果我们收到了数据，我们会知道它来自哪里。
 
-即使我们接收到数据，IP 也不能保证我们会按照其他计算机发送给我们的顺序接收到不同的数据块。因此，我们可以在接收到图像的左上角之前接收到图像的中心，在接收到图像的右下角之后接收到它，例如。
+即使我们收到了数据，IP 也不保证我们会按发送方发送的顺序接收到不同的数据块。例如，我们可能会先收到图像的中央部分，然后才收到左上角，或者右下角。
 
-是 TCP（即传输控制协议）要求发送方重新发送任何丢失的数据，并将其全部按正确的顺序放置。
+正是 TCP（*传输控制协议*）要求发送方重新发送任何丢失的数据，并将所有数据按正确的顺序排列。
 
-总而言之，一个计算机向另一个计算机传输图像的过程需要五种不同的协议。我们接收到的数据被包装成 PNG 协议，然后被包装成 HTTP 协议，再被包装成 TCP 协议，接着是 IP 协议，最后是以太网协议。
+总之，从一台计算机传输到另一台计算机，告诉它一张图像是什么样子的，竟然用了*五个*不同的协议。我们收到了包裹在 PNG 协议中的数据，再包裹在 HTTP 协议中，再包裹在 TCP 协议中，再包裹在 IP 协议中，最后包裹在以太网协议中。
 
-哦，顺便提一下，可能还涉及到其他几种协议。例如，如果我们的局域网通过拨号连接到互联网，那么会使用调制解调器上的 PPP 协议，该调制解调器又使用各种调制解调器协议，等等，等等，等等……
+哦，顺便说一句，可能还有许多其他协议参与了这个过程。例如，如果我们的局域网通过拨号连接到 Internet，那么它就用了 PPP 协议，通过调制解调器传输，调制解调器又使用了一个（或多个）不同的调制解调协议，等等，等等……
 
-作为开发者，你现在可能会问，“我应该如何处理这一切？”
+作为开发人员，你现在应该会问：“我该如何处理这一切？”
 
-幸运的是，您不必处理所有这些。 您只需要处理其中的一部分，而不是全部。 具体来说，您无需担心物理连接（在我们的情况下是以太网和可能的 PPP 等）。 您也无需处理 Internet 协议或传输控制协议。
+幸运的是，你并不需要处理所有这些内容。你*需要*处理其中的一部分，但不是全部。具体来说，你不必担心物理连接（在我们这个例子中是 Ethernet 和可能的 PPP 等）。你也不必处理互联网协议或传输控制协议。
 
-换句话说，您无需做任何事情来接收来自其他计算机的数据。 好吧，您确实需要请求数据，但这几乎和打开文件一样简单。
+换句话说，你不需要做任何事情来接收来自另一台计算机的数据。嗯，你确实需要*请求*它，但这几乎就像打开一个文件一样简单。
 
-一旦您收到数据，就由您决定如何处理它。 在我们的情况下，您需要了解 HTTP 协议和 PNG 文件结构。
+一旦你接收到数据，就由你来决定如何处理它。在我们的例子中，你需要理解 HTTP 协议和 PNG 文件结构。
 
-使用类比，所有的互联网协议都变成了一个灰色地带：并不是因为我们不理解它是如何工作的，而是因为我们不再关心它。套接字接口为我们处理了这个灰色地带：
+举个比喻，所有的网络协议变成了一个灰色地带：这不仅仅是因为我们不理解它是如何工作的，而是因为我们不再关注它。套接字接口为我们处理了这一灰色地带：
 
 ![slayers](https://docs.freebsd.org/images/books/developers-handbook/slayers.png)
 
-图 2. 套接字覆盖的协议层
+**图 2. 套接字覆盖的协议层**
 
-我们只需要理解告诉我们如何解释数据的任何协议，而不需要了解如何从另一个进程接收数据，也不需要了解如何将数据发送到另一个进程。
+我们只需要理解任何告诉我们如何*解释数据*的协议，而不是如何*从另一个进程接收*数据，或如何*发送*数据到另一个进程。
 
-## 7.4. BSD 套接字模型
 
-BSD 套接字建立在基本的 UNIX® 模型之上：一切皆为文件。在我们的例子中，套接字允许我们接收一个类似 HTTP 文件的内容。然后我们需要从中提取 PNG 文件。
+## 7.4. 套接字模型
 
-由于互联网工作的复杂性，我们不能仅仅使用 open 系统调用，或者 open() C 函数。相反，我们需要采取几个步骤来“打开”一个套接字。
+BSD 套接字是建立在基本 UNIX® 模型之上的：*一切皆文件*。在我们的例子中，套接字可以让我们接收一个*HTTP 文件*，可以这么说。然后，剩下的工作就是从中提取出*PNG 文件*。
 
-Once we do, however, we can start treating the *socket* the same way we treat any *file descriptor*: We can `read` from it, `write` to it, `pipe` it, and, eventually, `close` it.
+由于互联网的复杂性，我们不能简单地使用 `open` 系统调用或 `open()` C 函数。相反，我们需要采取多个步骤来“打开”一个套接字。
 
-## 7.5. Essential Socket Functions
+然而，一旦我们完成这些步骤，我们就可以开始像处理任何*文件描述符*一样处理*套接字*：我们可以从中`read`、`write`、`pipe`，最后`close`它。
 
-While FreeBSD offers different functions to work with sockets, we only *need* four to "open" a socket. And in some cases we only need two.
+## 7.5. 必要的套接字函数
 
-### 7.5.1. 客户端-服务器的区别
+虽然 FreeBSD 提供了多种函数来操作套接字，但我们只需要四个来“打开”一个套接字。在某些情况下，我们甚至只需要两个。
 
-通常，基于套接字的数据通信的一端是服务器，另一端是客户端。
+### 7.5.1. 客户端与服务器的区别
 
-#### 7.5.1.1. 共同元素
+通常，套接字数据通信的一端是*服务器*，另一端是*客户端*。
+
+#### 7.5.1.1. 共同的元素
 
 ##### 7.5.1.1.1. `socket`
 
-客户端和服务器都使用的一个函数是 socket(2)。它是这样声明的：
+客户端和服务器都使用的一个函数是 [socket(2)](https://man.freebsd.org/cgi/man.cgi?query=socket&sektion=2&format=html)。它的声明如下：
 
 ```
 int socket(int domain, int type, int protocol);
 ```
 
-返回值的类型与 open 相同，都是整数。FreeBSD 从与文件句柄相同的池中分配其值。这使得套接字可以像文件一样对待。
+返回值与 `open` 相同，都是整数。FreeBSD 从与文件句柄相同的池中分配它的值。这使得套接字可以像文件一样被处理。
 
-domain 参数告诉系统您希望使用哪种协议族。它们中有很多，有些是特定供应商的，其他则非常常见。它们在 sys/socket.h 中声明。
+`domain` 参数告诉系统你希望使用的*协议族*。有许多协议族，其中一些是厂商特定的，其他的则是常见的。它们在 **sys/socket.h** 中声明。
 
-使用 PF_INET 用于 UDP、TCP 和其他互联网协议（IPv4）。
+对于 UDP、TCP 和其他 Internet 协议（IPv4），使用 `PF_INET`。
 
-为 type 参数定义了五个值，在 sys/socket.h 中再次定义。所有这些值都以“SOCK_”开头。最常见的是 SOCK_STREAM ，它告诉系统您正在请求可靠的流传递服务（与 PF_INET 一起使用时为 TCP）。
+`type` 参数有五个定义的值，也在 **sys/socket.h** 中声明。所有这些值都以 “SOCK\_” 开头。最常见的是 `SOCK_STREAM`，它告诉系统你请求一个*可靠的流式传输服务*（与 `PF_INET` 一起使用时是 TCP）。
 
-如果您请求 SOCK_DGRAM ，您将请求无连接的数据报传递服务（在我们的情况下为 UDP）。
+如果你请求的是 `SOCK_DGRAM`，你将请求一个*无连接的数据报传输服务*（在我们的例子中是 UDP）。
 
-如果您想要负责低层协议（如 IP），甚至是网络接口（例如以太网），您需要指定 SOCK_RAW 。
+如果你想控制底层协议（如 IP），甚至是网络接口（如以太网），你需要指定 `SOCK_RAW`。
 
-最后， protocol 参数取决于前两个参数，并非始终有意义。在这种情况下，请使用 0 作为其值。
+最后，`protocol` 参数取决于前两个参数，并非总是有意义。在这种情况下，可以将其值设置为 `0`。
 
-|  | 未连接的套接字<br /><br />现在，在 socket 函数中，我们并没有指定连接到哪个其他系统。我们新创建的套接字仍然保持未连接状态。<br /><br />这是有意为之：用电话类比来说，我们只是把调制解调器连接到了电话线上。我们既没有告诉调制解调器拨号，也没有告诉它在电话响时接听。 |
-| -- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+>**注意**
+>
+>未连接的套接字在 `socket` 函数中，我们并没有指定该套接字要连接到哪个其他系统。我们新创建的套接字仍然是*未连接的*。这是故意的：用电话的类比来说，我们刚刚将调制解调器接入电话线。我们既没有告诉调制解调器拨打电话，也没有告诉它在电话响起时接听。
 
 ##### 7.5.1.1.2. `sockaddr`
 
-sockets 系列的各种函数期望内存中的一个小区域的地址（或指针，用 C 术语来说）。sys/socket.h 中的各种 C 声明将其称为 struct sockaddr 。这个结构在同一个文件中声明：
+各种套接字系列的函数期望得到（或使用 C 术语的指针）内存中一小块区域的地址。这些 C 声明在 **sys/socket.h** 中将其称为 `struct sockaddr`。这个结构在同一个文件中声明：
 
 ```
 /*
- * Structure used by kernel to store most
- * addresses.
+ * 内核用于存储大多数地址的结构
  */
 struct sockaddr {
-	unsigned char	sa_len;		/* total length */
-	sa_family_t	sa_family;	/* address family */
-	char		sa_data[14];	/* actually longer; address value */
+	unsigned char	sa_len;		/* 总长度 */
+	sa_family_t	sa_family;	/* 地址族 */
+	char		sa_data[14];	/* 实际上更长；地址值 */
 };
-#define	SOCK_MAXADDRLEN	255		/* longest possible addresses */
+#define	SOCK_MAXADDRLEN	255		/* 最长的可能地址 */
 ```
 
-请注意 sa_data 字段声明的模糊性，就像一个 14 字节的数组一样，注释暗示可能不止 14 个。
+请注意 `sa_data` 字段的*模糊性*，它仅声明为 `14` 字节的数组，注释提示它可能包含超过 `14` 字节的数据。
 
-这种模糊性是有意的。套接字是一个非常强大的接口。尽管大多数人可能认为它只是互联网接口而已 - 现在大多数应用程序可能仅用于此目的 - 套接字可以用于几乎任何类型的进程间通信，其中互联网（或更准确地说是 IP）只是其中之一。
+这种模糊性是故意的。套接字是一个非常强大的接口。虽然大多数人可能认为它不过是一个 Internet 接口——并且大多数应用程序现在可能就是这样使用它——套接字几乎可以用于任何形式的进程间通信，其中互联网（或更确切地说是 IP）只是其中之一。
 
-sys/socket.h 是指套接字将处理的各种协议类型作为地址族，并在 sockaddr 的定义之前列出它们。
+**sys/socket.h** 将套接字所处理的各种协议称为*地址族*，并在 `sockaddr` 定义之前列出它们：
 
 ```
 /*
- * Address families.
+ * 地址族
  */
-#define	AF_UNSPEC	0		/* unspecified */
-#define	AF_LOCAL	1		/* local to host (pipes, portals) */
-#define	AF_UNIX		AF_LOCAL	/* backward compatibility */
-#define	AF_INET		2		/* internetwork: UDP, TCP, etc. */
-#define	AF_IMPLINK	3		/* arpanet imp addresses */
-#define	AF_PUP		4		/* pup protocols: e.g. BSP */
-#define	AF_CHAOS	5		/* mit CHAOS protocols */
-#define	AF_NS		6		/* XEROX NS protocols */
-#define	AF_ISO		7		/* ISO protocols */
+#define	AF_UNSPEC	0		/* 未指定 */
+#define	AF_LOCAL	1		/* 本地主机（管道、端口） */
+#define	AF_UNIX		AF_LOCAL	/* 向后兼容 */
+#define	AF_INET		2		/* 内联网：UDP、TCP 等 */
+#define	AF_IMPLINK	3		/* ARPANET IMP 地址 */
+#define	AF_PUP		4		/* PUP 协议：如 BSP */
+#define	AF_CHAOS	5		/* MIT CHAOS 协议 */
+#define	AF_NS		6		/* XEROX NS 协议 */
+#define	AF_ISO		7		/* ISO 协议 */
 #define	AF_OSI		AF_ISO
-#define	AF_ECMA		8		/* European computer manufacturers */
-#define	AF_DATAKIT	9		/* datakit protocols */
-#define	AF_CCITT	10		/* CCITT protocols, X.25 etc */
+#define	AF_ECMA		8		/* 欧洲计算机制造商 */
+#define	AF_DATAKIT	9		/* DataKit 协议 */
+#define	AF_CCITT	10		/* CCITT 协议，X.25 等 */
 #define	AF_SNA		11		/* IBM SNA */
 #define AF_DECnet	12		/* DECnet */
-#define AF_DLI		13		/* DEC Direct data link interface */
+#define AF_DLI		13		/* DEC 直接数据链路接口 */
 #define AF_LAT		14		/* LAT */
-#define	AF_HYLINK	15		/* NSC Hyperchannel */
+#define	AF_HYLINK	15		/* NSC 超级通道 */
 #define	AF_APPLETALK	16		/* Apple Talk */
-#define	AF_ROUTE	17		/* Internal Routing Protocol */
-#define	AF_LINK		18		/* Link layer interface */
-#define	pseudo_AF_XTP	19		/* eXpress Transfer Protocol (no AF) */
-#define	AF_COIP		20		/* connection-oriented IP, aka ST II */
-#define	AF_CNT		21		/* Computer Network Technology */
-#define pseudo_AF_RTIP	22		/* Help Identify RTIP packets */
-#define	AF_IPX		23		/* Novell Internet Protocol */
-#define	AF_SIP		24		/* Simple Internet Protocol */
-#define	pseudo_AF_PIP	25		/* Help Identify PIP packets */
-#define	AF_ISDN		26		/* Integrated Services Digital Network*/
-#define	AF_E164		AF_ISDN		/* CCITT E.164 recommendation */
-#define	pseudo_AF_KEY	27		/* Internal key-management function */
+#define	AF_ROUTE	17		/* 内部路由协议 */
+#define	AF_LINK		18		/* 链路层接口 */
+#define	pseudo_AF_XTP	19		/* eXpress Transfer 协议（无 AF） */
+#define	AF_COIP		20		/* 面向连接的 IP，亦称 ST II */
+#define	AF_CNT		21		/* 计算机网络技术 */
+#define pseudo_AF_RTIP	22		/* 帮助识别 RTIP 包 */
+#define	AF_IPX		23		/* Novell Internet 协议 */
+#define	AF_SIP		24		/* 简单互联网协议 */
+#define	pseudo_AF_PIP	25		/* 帮助识别 PIP 包 */
+#define	AF_ISDN		26		/* 综合服务数字网络 */
+#define	AF_E164		AF_ISDN		/* CCITT E.164 推荐 */
+#define	pseudo_AF_KEY	27		/* 内部密钥管理功能 */
 #define	AF_INET6	28		/* IPv6 */
-#define	AF_NATM		29		/* native ATM access */
+#define	AF_NATM		29		/* 原生 ATM 访问 */
 #define	AF_ATM		30		/* ATM */
-#define pseudo_AF_HDRCMPLT 31		/* Used by BPF to not rewrite headers
-					 * in interface output routine
+#define pseudo_AF_HDRCMPLT 31		/* BPF 用于不重写头部
+					 * 在接口输出例程中
 					 */
-#define	AF_NETGRAPH	32		/* Netgraph sockets */
-#define	AF_SLOW		33		/* 802.3ad slow protocol */
-#define	AF_SCLUSTER	34		/* Sitara cluster protocol */
+#define	AF_NETGRAPH	32		/* Netgraph 套接字 */
+#define	AF_SLOW		33		/* 802.3ad 慢协议 */
+#define	AF_SCLUSTER	34		/* Sitara 集群协议 */
 #define	AF_ARP		35
-#define	AF_BLUETOOTH	36		/* Bluetooth sockets */
+#define	AF_BLUETOOTH	36		/* 蓝牙套接字 */
 #define	AF_MAX		37
 ```
 
-用于 IP 的一个是 AF_INET。 它是常量 2 的符号。
+用于 IP 的是 AF\_INET，它是常量 `2` 的符号表示。
 
-它是 sockaddr 的 sa_family 字段中列出的地址族，决定了如何使用 sa_data 这些名义模糊的字节。
+正是 `sockaddr` 中列出的 *地址族* 决定了如何使用 `sa_data` 字段中那些模糊命名的字节。
 
-具体来说，每当地址族是 AF_INET 时，我们可以使用 netinet/in.h 中找到的 struct sockaddr_in ，无论 sockaddr 期望什么：
+具体来说，当*地址族*为 AF\_INET 时，我们可以在需要 `sockaddr` 的地方使用 **netinet/in.h** 中的 `struct sockaddr_in`：
 
 ```
 /*
- * Socket address, internet style.
+ * 套接字地址，互联网风格。
  */
 struct sockaddr_in {
 	uint8_t		sin_len;
@@ -224,38 +225,38 @@ struct sockaddr_in {
 };
 ```
 
-我们可以这样来可视化它的组织结构：
+我们可以通过以下方式可视化它的组织结构：
 
 ![sain](https://docs.freebsd.org/images/books/developers-handbook/sain.png)
 
-图 3. sockaddr_in 结构
+**图 3. `sockaddr_in` 结构**
 
-三个重要字段分别是 sin_family ，即结构的第一个字节， sin_port ，一个在第 2 和第 3 字节中找到的 16 位值，以及 sin_addr ，一个 32 位整数表示的 IP 地址，存储在第 4-7 字节中。
+三个重要的字段是 `sin_family`，它是结构的第 1 字节；`sin_port`，它是 16 位的值，存储在第 2 和第 3 字节中；以及 `sin_addr`，它是一个 32 位的 IP 地址整数表示，存储在第 4 至第 7 字节中。
 
-现在，让我们试着填写它。假设我们正在尝试为白天协议编写客户端，该协议简单地表示其服务器将向 port 13 写入表示当前日期和时间的文本字符串。我们想使用 TCP/IP，因此需要在地址族字段中指定 AF_INET 。 AF_INET 被定义为 2 。让我们使用 192.43.244.18 的 IP 地址，这是美国联邦政府的时间服务器（ time.nist.gov ）。
+现在，让我们尝试填充它。假设我们正在为 *daytime* 协议编写客户端，该协议简单地规定其服务器会将当前的日期和时间的文本字符串写入端口 13。我们希望使用 TCP/IP，因此我们需要在地址族字段中指定 `AF_INET`。`AF_INET` 被定义为 `2`。让我们使用 IP 地址 `192.43.244.18`，这是美国联邦政府的时间服务器（`time.nist.gov`）。
 
 ![sainfill](https://docs.freebsd.org/images/books/developers-handbook/sainfill.png)
 
-sockaddr_in 的特定示例图 4。
+**图 4. `sockaddr_in` 的具体示例**
 
-顺便说一下， sin_addr 字段被声明为 struct in_addr 类型，在 netinet/in.h 中定义：
+顺便提一下，`sin_addr` 字段被声明为 `struct in_addr` 类型，它在 **netinet/in.h** 中定义：
 
 ```
 /*
- * Internet address (a structure for historical reasons)
+ * Internet 地址（出于历史原因的结构）
  */
 struct in_addr {
 	in_addr_t s_addr;
 };
 ```
 
-除此之外， in_addr_t 是一个 32 位整数。
+此外，`in_addr_t` 是一个 32 位的整数。
 
-192.43.244.18 仅仅是一个便利的表示法，以列举所有 8 位字节，从最高有效位开始，来表达 32 位整数。
+`192.43.244.18` 只是通过列出其所有 8 位字节（从*最重要*的字节开始）来表示一个 32 位整数的便捷表示法。
 
-到目前为止，我们把 sockaddr 看作一个抽象概念。 我们的计算机不把 short 整数作为一个单独的 16 位实体来存储，而是作为 2 个字节的序列。类似地，它将 32 位整数存储为 4 个字节的序列。
+到目前为止，我们已经将 `sockaddr` 视为一种抽象。我们的计算机并不会将 `short` 整数存储为单一的 16 位实体，而是作为一系列的 2 个字节。类似地，它将 32 位整数存储为一系列 4 个字节。
 
-假设我们编写了这样的代码：
+假设我们编写了如下代码：
 
 ```
 sa.sin_family      = AF_INET;
@@ -265,109 +266,110 @@ sa.sin_addr.s_addr = (((((192 << 8) | 43) << 8) | 244) << 8) | 18;
 
 结果会是什么样子呢？
 
-当然，这取决于情况。在基于 Pentium®或其他 x86 的计算机上，它会是这样的：
+当然，这取决于具体的计算机系统。在一个奔腾或其他 x86 系统上，它会像这样显示：
 
 ![sainlsb](https://docs.freebsd.org/images/books/developers-handbook/sainlsb.png)
 
-Intel 系统上的 sockaddr_in 图 5。
+**图 5. 在 Intel 系统上的 `sockaddr_in`**
 
-在另一个系统上，它可能看起来像这样：
+在不同的系统上，可能会是这样的：
 
 ![sainmsb](https://docs.freebsd.org/images/books/developers-handbook/sainmsb.png)
 
-MSB 系统上的 sockaddr_in 图 6。
+**图 6. 在 MSB 系统上的 `sockaddr_in`**
 
-在 PDP 上可能会看起来有所不同。但以上两种是今天最常见的使用方式。
 
-通常，希望编写可移植代码的程序员会假装这些差异不存在。他们可以逃脱（除非他们用汇编语言编码）。然而，当编写套接字时，你不能那么轻易地逃脱。
+在 PDP 上，它的表现可能又会不同。但上述两种方式是如今最常见的两种实现方式。
 
- 为什么？
+通常，为了编写可移植的代码，程序员会假装这些差异并不存在。而他们确实也能蒙混过关（除非他们在写汇编语言）。不过，当你在为 sockets 编程时，你就不能这么轻松地蒙混过关了。
 
-因为在与另一台计算机通信时，通常不知道它是先存储数据的最高有效字节（MSB）还是最低有效字节（LSB）。
+为什么？
 
-也许你在想，“所以，套接字不会帮我处理吗？”
+因为在与另一台计算机通信时，你通常不知道它是以 *最高有效字节*（MSB）优先还是 *最低有效字节*（LSB）优先来存储数据的。
 
- 不会。
+你可能会想，*“那 sockets 难道不会替我处理这些吗？”*
 
-While that answer may surprise you at first, remember that the general sockets interface only understands the `sa_len` and `sa_family` fields of the `sockaddr` structure. You do not have to worry about the byte order there (of course, on FreeBSD `sa_family` is only 1 byte anyway, but many other UNIX® systems do not have `sa_len` and use 2 bytes for `sa_family`, and expect the data in whatever order is native to the computer).
+不会。
 
-But the rest of the data is just `sa_data[14]` as far as sockets goes. Depending on the *address family*, sockets just forwards that data to its destination.
+这个答案可能一开始让你感到惊讶，但请记住，通用的 sockets 接口只理解 `sockaddr` 结构中的 `sa_len` 和 `sa_family` 字段。你不必担心这些字段的字节序（当然，在 FreeBSD 上 `sa_family` 反正只有 1 个字节，但许多其他 UNIX® 系统没有 `sa_len` 字段，并且使用 2 字节的 `sa_family` 字段，并且期望数据以该计算机的本地顺序存储）。
 
-Indeed, when we enter a port number, it is because we want the other computer to know what service we are asking for. And, when we are the server, we read the port number so we know what service the other computer is expecting from us. Either way, sockets only has to forward the port number as data. It does not interpret it in any way.
+但对 sockets 而言，其余的数据就只是 `sa_data[14]`。根据 *地址族* 的不同，sockets 只是将这些数据转发到目标地。
 
-同样，我们输入 IP 地址告诉路上的每个人数据应该发送到哪里。套接字只是将其作为数据转发。
+事实上，当我们输入一个端口号时，是为了让另一台计算机知道我们请求的是什么服务。而当我们是服务器时，我们读取端口号，是为了知道对方期望我们提供什么服务。无论是哪种情况，sockets 只是将端口号当作数据转发。它不会对其进行任何解释。
 
-这就是为什么我们（程序员，而不是套接字）必须区分我们计算机使用的字节顺序和发送数据给其他计算机的传统字节顺序之间的差异。
+同样，我们输入 IP 地址，是为了告诉网络上的所有中间设备数据应该被送往何处。sockets 依旧只是将其当作数据转发。
 
-我们将我们计算机使用的字节顺序称为主机字节顺序，或者只是主机顺序。
+这就是为什么，我们（*程序员*，而不是 *sockets*）必须区分我们的计算机使用的字节序与用于发送给另一台计算机的标准字节序。
 
-在 IP 上发送多字节数据的惯例是先发送最高有效字节。我们将其称为网络字节顺序，或简称网络顺序。
+我们称我们的计算机使用的字节序为 *主机字节序*，简称 *主机序*。
 
-现在，如果我们为基于英特尔的计算机编译上述代码，我们的主机字节顺序将产生：
+而在 IP 上传送多字节数据有一个约定，就是以 *MSB 优先* 的方式传送。我们称这种顺序为 *网络字节序*，简称 *网络序*。
+
+现在，如果我们将上面的代码编译为运行在 Intel 架构的计算机上，我们的 *主机字节序* 将会产生如下结果：
 
 ![sainlsb](https://docs.freebsd.org/images/books/developers-handbook/sainlsb.png)
 
-图 7. 英特尔系统上的主机字节顺序
+**图 7. Intel 系统上的主机字节序**
 
-但网络字节顺序要求我们先将数据存储为 MSB：
+但 *网络字节序* 要求我们以 MSB 优先的方式存储数据：
 
 ![sainmsb](https://docs.freebsd.org/images/books/developers-handbook/sainmsb.png)
 
-图 8. 网络字节顺序
+**图 8. 网络字节序**
 
-不幸的是，我们的主机顺序恰好与网络顺序相反。
+不幸的是，我们的 *主机序* 与 *网络序* 完全相反。
 
-我们有几种处理它的方法。一种方法是在我们的代码中反转值：
+我们有几种方式可以应对这种情况。其中一种方法是在代码中 *反转* 这些值：
 
-```
+```c
 sa.sin_family      = AF_INET;
 sa.sin_port        = 13 << 8;
 sa.sin_addr.s_addr = (((((18 << 8) | 244) << 8) | 43) << 8) | 192;
 ```
 
-这将欺骗我们的编译器将数据存储为网络字节顺序。在某些情况下，这确实是解决问题的方法（例如，在汇编语言中编程时）。然而，在大多数情况下，这可能会导致问题。
+这样可以“骗过”我们的编译器，让它以 *网络字节序* 存储这些数据。在某些情况下，这确实是正确的做法（比如当你在写汇编语言的时候）。但在大多数情况下，这会引起问题。
 
-假设你用 C 编写了一个基于套接字的程序。你知道它将在 Pentium® 上运行，所以你把所有常量反向输入，并强制它们符合网络字节顺序。这运行良好。
+假设你用 C 写了一个基于 sockets 的程序。你知道它会运行在奔腾上，于是你将所有常量反转后强行设为 *网络字节序*。一切正常。
 
-然后，有一天，您信任的旧奔腾®变成了生锈的旧奔腾®。您用一个主机顺序与网络顺序相同的系统来替换它。您需要重新编译所有的软件。除了您写的那个程序之外，所有软件继续表现良好。
+直到有一天，你信赖的旧奔腾变成了锈迹斑斑的老古董。你换了一台新机器，它的 *主机序* 正好和 *网络序* 一致。你重新编译了你的所有软件。所有程序都运作良好，除了你那一个程序。
 
-自那以后，您已经忘记了您曾经强制所有常量为相反的主机顺序。您花费一些质量时间拔掉您的头发，叫出您听说过的所有神明的名字（和一些您编造的），用软皮球棒击打您的监视器，并执行尝试弄清为什么一切运作良好的事情突然完全不起作用的所有其他传统仪式。
+你已经忘了当初你曾经强行把所有常量写成了和 *主机序* 相反的顺序。你开始拔头发，呼唤你听过和没听过的所有神的名字，用海绵棒猛击显示器，进行各种传统的“调试祭祀仪式”，试图搞清楚为什么一个一直工作良好的程序突然就失效了。
 
-最终，您弄清楚了，说了几句脏话，然后开始重新编写代码。
+最终，你搞清楚了问题的根源，骂了几句脏话，然后开始重写你的代码。
 
-幸运的是，你不是第一个面对这个问题的人。其他人已经创建了 htons(3)和 htonl(3) C 函数，用于将主机字节顺序转换为网络字节顺序中的 short 和 long ，以及用于另一种方式的 ntohs(3)和 ntohl(3) C 函数。
+幸运的是，你不是第一个遇到这个问题的人。早有人已经创建了 [htons(3)](https://man.freebsd.org/cgi/man.cgi?query=htons&sektion=3&format=html) 和 [htonl(3)](https://man.freebsd.org/cgi/man.cgi?query=htonl&sektion=3&format=html) 这两个 C 函数，分别用于将 `short` 和 `long` 从 *主机字节序* 转换为 *网络字节序*；还有 [ntohs(3)](https://man.freebsd.org/cgi/man.cgi?query=ntohs&sektion=3&format=html) 和 [ntohl(3)](https://man.freebsd.org/cgi/man.cgi?query=ntohl&sektion=3&format=html) 函数，用于反向转换。
 
-在 MSB 优先系统上，这些函数不起作用。在 LSB 优先系统上，它们会将值转换为正确的顺序。
+在 *MSB 优先* 的系统上，这些函数不会进行任何操作。而在 *LSB 优先* 的系统上，它们会将值转换为正确的顺序。
 
-因此，无论你的软件在哪种系统上编译，如果你使用这些函数，你的数据都将按正确的顺序排列。
+所以，无论你的软件是在哪个系统上编译的，只要使用这些函数，你的数据最终就会以正确的顺序被传送出去。
 
-#### 7.5.1.2. 客户端功能
+#### 7.5.1.2. 客户端函数
 
-通常情况下，客户端会发起与服务器的连接。客户端知道它要调用哪个服务器：它知道服务器的 IP 地址，并且知道服务器所在的 port。这类似于你拿起电话拨打号码（地址），然后在有人接听后，询问负责 wingdings 的人（port）。
+通常，客户端负责发起与服务器的连接。客户端知道它要联系哪个服务器：它知道服务器的 IP 地址，也知道服务器所监听的 *端口*。这就像你拿起电话拨号（这个 *地址*），然后在有人接听后请求找负责“wingdings”的人（这个 *端口*）。
 
 ##### 7.5.1.2.1. `connect`
 
-一旦客户端创建了一个套接字，它需要将其连接到远程系统上的特定 port。它使用 connect(2)：
+客户端创建了 socket 后，就需要将其连接到远程系统的一个特定端口。它会使用 [connect(2)](https://man.freebsd.org/cgi/man.cgi?query=connect&sektion=2&format=html)：
 
-```
+```c
 int connect(int s, const struct sockaddr *name, socklen_t namelen);
 ```
 
-s 参数是套接字，即 socket 函数返回的值。 name 是指向我们广泛讨论过的 sockaddr 结构的指针。最后， namelen 通知系统我们的 sockaddr 结构中有多少字节。
+参数 `s` 是 socket，也就是 `socket` 函数返回的值。`name` 是一个指向 `sockaddr` 的指针，我们前面已经详细讨论过该结构。最后，`namelen` 用于告知系统我们的 `sockaddr` 结构体的字节数。
 
-如果 connect 成功，则返回 0 。否则返回 -1 并将错误代码存储在 errno 中。
+如果 `connect` 调用成功，它会返回 `0`。否则返回 `-1`，并将错误代码存储在 `errno` 中。
 
-有许多原因可能导致 connect 失败。例如，尝试连接到互联网时，IP 地址可能不存在，或者它可能已关闭，或者忙得不可开交，或者在指定的 port 处没有服务器在监听。或者它可能直接拒绝对特定代码的任何请求。
+`connect` 可能失败的原因有很多。例如，在尝试连接到某个互联网地址时，对方的 IP 地址可能根本不存在，或者对方主机宕机了，或者太忙，或者根本没有在指定端口监听任何服务。也有可能直接 *拒绝* 来自特定代码的任何请求。
 
-##### 7.5.1.2.2. 我们的第一个客户
+##### 7.5.1.2.2. 我们的第一个客户端
 
-现在我们已经了解足够的信息，可以编写一个非常简单的客户端，该客户端将从 192.43.244.18 获取当前时间并将其打印到标准输出。
+现在我们已经掌握足够知识，来编写一个非常简单的客户端程序，它将从 `192.43.244.18` 获取当前时间并打印到 **stdout**。
 
-```
+```c
 /*
  * daytime.c
  *
- * Programmed by G. Adam Stanislav
+ * G. Adam Stanislav 编写
  */
 #include <stdio.h>
 #include <string.h>
@@ -377,38 +379,38 @@ s 参数是套接字，即 socket 函数返回的值。 name 是指向我们广�
 #include <unistd.h>
 
 int main() {
-  register int s;
-  register int bytes;
+  int s, bytes;
   struct sockaddr_in sa;
   char buffer[BUFSIZ+1];
 
   if ((s = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
-    perror("socket");
+    perror("socket");      // 打开 socket 失败
     return 1;
   }
 
-  bzero(&sa, sizeof sa);
+  memset(&sa, '\0', sizeof(sa));  // 清空结构体
 
-  sa.sin_family = AF_INET;
-  sa.sin_port = htons(13);
-  sa.sin_addr.s_addr = htonl((((((192 << 8) | 43) << 8) | 244) << 8) | 18);
+  sa.sin_family = AF_INET;                  // 使用 IPv4
+  sa.sin_port = htons(13);                 // 端口号 13（daytime 服务）
+  sa.sin_addr.s_addr = htonl((((((192 << 8) | 43) << 8) | 244) << 8) | 18);  // IP 地址
+
   if (connect(s, (struct sockaddr *)&sa, sizeof sa) < 0) {
-    perror("connect");
-    close(s);
+    perror("connect");     // 连接失败
+    close(s);              // 关闭 socket
     return 2;
   }
 
   while ((bytes = read(s, buffer, BUFSIZ)) > 0)
-    write(1, buffer, bytes);
+    write(1, buffer, bytes);  // 输出到标准输出
 
-  close(s);
+  close(s);  // 关闭连接
   return 0;
 }
 ```
 
-继续，在您的编辑器中输入它，保存为 daytime.c，然后编译并运行它：
+现在请打开编辑器，输入上述内容，保存为 **daytime.c**，然后编译并运行它：
 
-```
+```sh
 % cc -O3 -o daytime daytime.c
 % ./daytime
 
@@ -416,80 +418,80 @@ int main() {
 %
 ```
 
-在这种情况下，日期是 2001 年 6 月 19 日，时间是 02:29:25 UTC。当然，您的结果会有所不同。
+在本例中，日期是 2001 年 6 月 19 日，时间是 UTC 时间 02:29:25。当然，你运行程序时的输出会有所不同。
 
-#### 7.5.1.3. 服务器功能
+#### 7.5.1.3. 服务器函数
 
-典型的服务器不会发起连接。相反，它等待客户端调用并请求服务。它不知道客户端何时会调用，也不知道会有多少客户端会调用。它可能会静静地坐在那里等待，一会儿的功夫，下一刻可能会发现自己被来自多个客户端的请求淹没，所有客户端都在同一时间内呼叫。
+典型的服务器不会主动发起连接。它会等待客户端来调用它、请求服务。它不知道客户端什么时候会来，也不知道会有多少客户端会来。有时候它只是静静地坐在那里等待，而下一刻，可能就会突然被大量同时请求的客户端淹没。
 
-套接字接口提供了三个基本函数来处理这个。
+sockets 接口提供了三个基本函数来处理这一情况。
 
 ##### 7.5.1.3.1. `bind`
 
-Ports 就像是电话线的分机：拨打号码后，您可以拨分机号码来联系特定的人员或部门。
+端口就像电话线路上的分机：拨通一个号码后，还需要拨分机号才能联系到特定的人或部门。
 
-IP ports 有 65535 个，但服务器通常只处理其中一个进来的请求。这就像告诉电话室操作员我们已经上班，并且可以在特定的分机上接听电话。我们使用 bind(2)告诉套接字我们要服务的port。
+IP 端口总共有 65535 个，但服务器通常只处理来自其中某一个端口的请求。这就像告诉电话总机我们正在工作，可以在某个特定分机上接电话。我们使用 [bind(2)](https://man.freebsd.org/cgi/man.cgi?query=bind&sektion=2&format=html) 告诉 sockets 我们要监听哪个端口。
 
-```
+```c
 int bind(int s, const struct sockaddr *addr, socklen_t addrlen);
 ```
 
-除了在 addr 中指定port外，服务器可能还包括其 IP 地址。但是，它可以只使用象征常数 INADDR_ANY 来指示它将为指定的port处理所有请求，而不管其 IP 地址是什么。这个符号以及其他几个类似的符号在 netinet/in.h 中声明。
+除了在 `addr` 中指定端口，服务器也可以包括它自己的 IP 地址。然而，它也可以使用符号常量 INADDR\_ANY 来表示将接收发往该端口的所有请求，而不管目标 IP 是什么。这个符号常量和其他几个类似常量都定义在 **netinet/in.h** 中：
 
-```
+```c
 #define	INADDR_ANY		(u_int32_t)0x00000000
 ```
 
-假设我们正在为 TCP/IP 上的白天协议编写服务器。回想一下，它使用端口port 13。我们的 sockaddr_in 结构将如下所示：
+假设我们要写一个基于 TCP/IP 的 *daytime* 协议服务器。回忆一下，它使用端口 13。我们的 `sockaddr_in` 结构将如下所示：
 
 ![sainserv](https://docs.freebsd.org/images/books/developers-handbook/sainserv.png)
 
-图 9. 示例服务器 sockaddr_in
+图 9. 示例服务器 sockaddr\_in
 
 ##### 7.5.1.3.2. `listen`
 
-继续我们办公电话类比，告诉电话总机您将在哪个分机后，您现在走进办公室，确保自己的电话已插好线并且铃声已打开。此外，确保您已激活呼叫等待功能，这样您在与某人通话时也能听到电话响铃。
+继续我们之前的电话比喻：当你告诉总机你在哪个分机接电话后，你就走进办公室，确保电话插好了，铃声打开了。此外，你还要确保电话支持“通话中等待”，以便即使你正在通话中也能听到新的来电。
 
-服务器通过 listen(2) 函数确保所有这些。
+服务器使用 [listen(2)](https://man.freebsd.org/cgi/man.cgi?query=listen&sektion=2&format=html) 函数来确保这一切。
 
-```
+```c
 int listen(int s, int backlog);
 ```
 
-在这里， backlog 变量告诉套接字在您忙于处理上一个请求时要接受多少传入请求。换句话说，它确定了挂起连接队列的最大大小。
+这里的 `backlog` 参数告诉 sockets：在你还在处理上一个请求时，最多可以接受多少个挂起的请求。换句话说，它决定了待处理连接队列的最大长度。
 
 ##### 7.5.1.3.3. `accept`
 
-在你听到电话响的声音之后，通过接听电话来接受通话。您现在已与您的客户建立了连接。此连接保持活动状态，直到您或您的客户挂断电话。
+电话铃响之后，你接起电话，就建立了与客户端的连接。该连接会一直保持，直到你或客户端挂断为止。
 
-服务器使用 accept(2)函数接受连接。
+服务器使用 [accept(2)](https://man.freebsd.org/cgi/man.cgi?query=accept&sektion=2&format=html) 函数来接收连接：
 
-```
+```c
 int accept(int s, struct sockaddr *addr, socklen_t *addrlen);
 ```
 
-请注意，此时 addrlen 是一个指针。这是必要的，因为在这种情况下，是套接字填充 addr ， sockaddr_in 结构。
+注意这次 `addrlen` 是一个指针。这是因为在这个调用中由 socket 来填写 `addr`，也就是 `sockaddr_in` 结构。
 
-返回值是一个整数。实际上， accept 返回一个新的套接字。您将使用这个新套接字与客户端通信。
+返回值是一个整数。实际上，`accept` 返回的是一个 *新 socket*。你将使用这个新 socket 来与客户端通信。
 
-旧套接字会发生什么？它会继续监听更多请求（记住我们传递给 listen 的 backlog 变量吗？）直到我们 close 它。
+那旧的 socket 呢？它仍然监听更多的请求（还记得我们传给 `listen` 的 `backlog` 吗？），直到我们调用 `close`。
 
-现在，新套接字仅用于通信。它已完全连接。我们不能再次将其传递给 listen ，尝试接受其他连接。
+而新的 socket 仅用于通信。它是完全连接的，不能再传给 `listen` 去接受其他连接。
 
 ##### 7.5.1.3.4. 我们的第一个服务器
 
-我们的第一个服务器将比我们的第一个客户端复杂一些：我们不仅有更多的套接字函数可用，而且需要将其编写为守护进程。
+我们的第一个服务器比我们的第一个客户端要复杂一些：不仅使用了更多的 sockets 函数，而且我们需要将它写成一个守护进程（daemon）。
 
-最好的方法是在绑定port后创建一个子进程。然后主进程退出并将控制权返回给调用它的shell（或任何其他调用它的程序）。
+最好的方式是，在绑定端口之后创建一个 *子进程*。主进程随即退出，将控制权还给 shell（或调用它的其他程序）。
 
-该子项调用 listen ，然后启动一个无限循环，该循环接受连接、为其提供服务，最终关闭套接字。
+子进程调用 `listen`，然后进入一个无限循环，接受连接、提供服务、最终关闭该连接的 socket。
 
-```
+```c
 /*
- * daytimed - a port 13 server
+ * daytimed - 一个监听端口 13 的服务器
  *
- * Programmed by G. Adam Stanislav
- * June 19, 2001
+ * G. Adam Stanislav 编写
+ * 2001 年 6 月 19 日
  */
 #include <stdio.h>
 #include <string.h>
@@ -502,8 +504,8 @@ int accept(int s, struct sockaddr *addr, socklen_t *addrlen);
 #define BACKLOG 4
 
 int main() {
-    register int s, c;
-    int b;
+    int s, c;
+    socklen_t b;
     struct sockaddr_in sa;
     time_t t;
     struct tm *tm;
@@ -514,7 +516,7 @@ int main() {
         return 1;
     }
 
-    bzero(&sa, sizeof sa);
+    memset(&sa, '\0', sizeof(sa));
 
     sa.sin_family = AF_INET;
     sa.sin_port   = htons(13);
@@ -531,11 +533,9 @@ int main() {
         case -1:
             perror("fork");
             return 3;
-            break;
         default:
             close(s);
             return 0;
-            break;
         case 0:
             break;
     }
@@ -557,7 +557,6 @@ int main() {
 
         if ((t = time(NULL)) < 0) {
             perror("daytimed time");
-
             return 6;
         }
 
@@ -575,72 +574,72 @@ int main() {
 }
 ```
 
-我们首先创建一个套接字。然后在 sa 中填写 sockaddr_in 结构。注意对 INADDR_ANY 的条件性使用：
+我们首先创建一个 socket。然后填写 `sa` 中的 `sockaddr_in` 结构体。注意对 INADDR\_ANY 的条件使用：
 
-```
+```c
 if (INADDR_ANY)
         sa.sin_addr.s_addr = htonl(INADDR_ANY);
 ```
 
-它的值是 0 。由于我们刚刚使用 bzero 的整个结构，将其再次设置为 0 是多余的。但是如果我们将我们的代码移植到另一个系统，其中 INADDR_ANY 或许不是零，那么我们需要将其分配给 sa.sin_addr.s_addr 。大多数现代 C 编译器足够聪明，注意到 INADDR_ANY 是一个常量。只要它是零，它们就会优化整个条件语句从代码中移除。
+其值为 `0`。由于我们刚刚对整个结构体使用了 `bzero`，再次将其设为 `0` 是多余的。但如果我们将代码移植到某个 `INADDR_ANY` 也许不是零的系统上，就必须显式地将它赋值给 `sa.sin_addr.s_addr`。多数现代 C 编译器足够聪明，它们会发现 `INADDR_ANY` 是一个常量，只要它的值是零，就会自动优化掉整个条件语句。
 
-在我们成功地调用 bind 后，我们准备成为守护程序：我们使用 fork 来创建一个子进程。在父进程和子进程中， s 变量是我们的套接字。父进程不需要它，所以它调用 close ，然后返回 0 以通知它自己的父进程它已成功终止。
+成功调用 `bind` 之后，我们就准备好变成一个 *守护进程*（daemon）：我们使用 `fork` 创建一个子进程。在父进程和子进程中，变量 `s` 都是我们的 socket。父进程不再需要它，于是它调用 `close`，然后返回 `0`，告知其父进程它已经成功终止。
 
-与此同时，子进程继续在后台工作。它调用 listen 并将其后备设置为 4 。这里不需要一个很大的值，因为白天不是许多客户端一直请求的协议，并且因为它可以立即处理每个请求。
+与此同时，子进程继续在后台运行。它调用 `listen`，将 `backlog` 设置为 `4`。这个值不需要太大，因为 *daytime* 并不是一个有很多客户端频繁请求的协议，而且每个请求也能被瞬间处理完毕。
 
-最后，守护程序启动一个无休止的循环，执行以下步骤：
+最后，守护进程启动一个无限循环，按以下步骤操作：
 
-1. 调用 accept 。它在这里等待，直到客户端联系。此时，它会接收一个新的套接字 c ，用于与特定客户端通信。
-2. 使用 C 函数 fdopen 将套接字从低级文件描述符转换为 C 风格的 FILE 指针。这将允许稍后使用 fprintf 。
-3. 检查时间，并以 ISO 8601 格式打印到 client "文件"。然后使用 fclose 关闭文件。这将自动关闭套接字。
+1. 调用 `accept`。它会阻塞，直到有客户端连接。此时，它会获得一个新的 socket `c`，用于与这个特定客户端通信。
+2. 使用 C 函数 `fdopen` 将 socket 从底层 *文件描述符* 转换为 C 风格的 `FILE` 指针，这样可以后续使用 `fprintf`。
+3. 获取当前时间，并用 *ISO 8601* 格式打印到 `client` “文件”中。随后使用 `fclose` 关闭该文件，这也会自动关闭对应的 socket。
 
-我们可以概括这一点，并将其用作许多其他服务器的模型:
+我们可以将这个模式 *泛化*，作为许多其他服务器的模板：
 
 ![serv](https://docs.freebsd.org/images/books/developers-handbook/serv.png)
 
-图 10. 顺序服务器
+**图 10. 顺序服务器（Sequential Server）**
 
-这个流程图适用于顺序服务器，即一次只能为一个客户提供服务的服务器，就像我们之前在白天服务器中所能做的一样。只有在客户端和服务器之间没有真正的“对话”时才有可能：一旦服务器检测到与客户端的连接，它就会发送一些数据然后关闭连接。整个操作可能只需几纳秒，就完成了。
+这个流程图适用于 *顺序服务器*，即一次只能服务一个客户端的服务器，就像我们的 *daytime* 服务器一样。只有在客户端和服务器之间没有真正的“对话”时，这种方式才是可行的：一旦服务器检测到客户端连接，它便立即发送一些数据，然后关闭连接。整个过程可能只需几纳秒便完成。
 
-这个流程图的优点是，除了父 fork 退出之前的短暂时刻外，始终只有一个进程处于活动状态：我们的服务器不会占用太多内存和其他系统资源。
+这种流程图的优点在于，除了 `fork` 之后父进程退出之前那一瞬间，始终只有一个 *进程* 活跃：服务器不会占用太多内存和系统资源。
 
-请注意，我们在流程图中添加了初始化守护程序。我们不需要初始化自己的守护程序，但这是程序流程中设置任何 signal 处理程序、打开可能需要的任何文件等的好地方。
+注意，我们在流程图中添加了 *初始化守护进程* 的步骤。虽然我们的例子中不需要初始化守护进程，但这是在程序流程中设置 `signal` 信号处理器、打开可能用到的文件等的良好位置。
 
-流程图中的几乎所有内容都可以在许多不同的服务器上直接使用。serve 条目是个例外。我们将其视为一个“黑匣子”，即，您专门为自己的服务器设计的东西，只需“将其插入其余部分”即可。
+几乎流程图中所有内容都可以原样用于许多不同的服务器中，唯独 *serve* 部分是个例外。我们可以把它当作一个 *“黑箱”*，即根据自己的服务器需求特别设计的部分，然后“插入”到其余部分中即可。
 
-并非所有协议都那么简单。许多协议接收来自客户端的请求，然后回复该请求，接着再次接收来自同一客户端的请求。因此，它们事先无法知道为客户端提供服务的时长。这类服务器通常为每个客户端启动一个新进程。在新进程为其客户端提供服务时，守护程序可以继续侦听更多连接。
+并非所有协议都如此简单。很多协议都需要从客户端接收请求、回复请求，然后再次接收同一客户端的新请求。因此，它们无法预先知道需要服务多长时间。这类服务器通常会为每个客户端创建一个新进程。在新进程服务其客户端的同时，守护进程仍可继续监听新的连接。
 
-现在，继续吧，将上述源代码保存为 daytimed.c（以字母 0 结尾的守护程序名称是惯例）。编译后，尝试运行它：
+现在，请将上述源代码保存为 **daytimed.c**（按照惯例，守护进程的程序名以字母 `d` 结尾）。编译后尝试运行它：
 
-```
+```sh
 % ./daytimed
 bind: Permission denied
 %
 ```
 
-发生了什么？正如你所记得的，白天协议使用 13。但是 1024 以下的所有端口都保留给超级用户（否则，任何人都可以启动一个假装为常用端口提供服务的守护程序，从而造成安全漏洞）。
+发生了什么？如你所知，*daytime* 协议使用的是端口 13。但所有小于 1024 的端口都是保留给超级用户的（否则任何人都可以伪装成一个守护进程，服务一个常见端口，从而造成安全漏洞）。
 
-请再试一次，这次以超级用户身份：
+这次以超级用户身份再试一次：
 
-```
+```sh
 # ./daytimed
 #
 ```
 
-什么... 什么也没有？让我们再试一次：
+什么…… 没有任何输出？我们再试一次：
 
-```
+```sh
 # ./daytimed
 
 bind: Address already in use
 #
 ```
 
-每个port 一次只能由一个程序绑定。我们的第一次尝试确实成功了：它启动了子守护程序并静静地返回。它仍在运行，并将继续运行，直到您杀死它，或者它的任何系统调用失败，或者您重新启动系统。
+每个端口在同一时间只能被一个程序绑定。我们的第一次尝试实际上是成功的：它启动了子守护进程并静默返回。它仍在后台运行，并将一直运行，直到你终止它、它的系统调用失败，或者你重启系统。
 
-好吧，我们知道它在后台运行。但它是否正常工作呢？我们如何知道它是一个适合白天运行的服务器呢？简单：
+很好，我们知道它在后台运行。但它真的 *工作* 吗？怎么知道它是一个正确的 *daytime* 服务器？很简单：
 
-```
+```sh
 % telnet localhost 13
 
 Trying ::1...
@@ -653,11 +652,11 @@ Connection closed by foreign host.
 %
 ```
 
-telnet 尝试了新的 IPv6，但失败了。它改用 IPv4 再次尝试，成功了。守护进程有效。
+telnet 先尝试使用新的 IPv6，失败后改用 IPv4 并成功连接。守护进程正常运行。
 
-如果您可以通过 telnet 访问另一个 UNIX®系统，则可以使用它来测试远程访问服务器。我的计算机没有静态 IP 地址，所以我这样做：
+如果你能通过 telnet 访问另一台 UNIX® 系统，也可以用它来远程测试服务器。我所用的计算机没有静态 IP 地址，因此我做了如下测试：
 
-```
+```sh
 % who
 
 whizkid          ttyp0   Jun 19 16:59   (216.127.220.143)
@@ -672,9 +671,9 @@ Connection closed by foreign host.
 %
 ```
 
-再次，它有效。使用域名会有效吗？
+它确实工作了。那么用域名也行吗？
 
-```
+```sh
 % telnet r47.bfm.org 13
 
 Trying 216.127.220.143...
@@ -685,42 +684,42 @@ Connection closed by foreign host.
 %
 ```
 
-顺便说一下，telnet 在我们的守护程序关闭套接字后打印“连接由外部主机关闭”消息。这向我们表明，确实，在我们的代码中使用 fclose(client); 是有效的。
+顺便说一句，telnet 在我们的守护进程关闭 socket 后打印 *Connection closed by foreign host* 消息，这证明我们代码中使用 `fclose(client);` 的做法确实起到了作用。
 
-## 7.6. 助手函数
+## 7.6. 辅助函数
 
-FreeBSD C 库包含许多用于套接字编程的辅助函数。例如，在我们的示例客户端中，我们硬编码了 time.nist.gov IP 地址。但我们并不总是知道 IP 地址。即使我们知道，如果软件允许用户输入 IP 地址甚至域名，它会更加灵活。
+FreeBSD 的 C 标准库包含许多用于 socket 编程的辅助函数。例如，在我们的示例客户端中，我们是将 `time.nist.gov` 的 IP 地址硬编码进程序的。但我们并不总是知道 IP 地址。即使知道，如果程序允许用户输入 IP 地址，甚至是域名，它也会更灵活。
 
 ### 7.6.1. `gethostbyname`
 
-虽然没有办法将域名直接传递给任何套接字函数，但 FreeBSD C 库带有在 netdb.h 中声明的 gethostbyname(3) 和 gethostbyname2(3) 函数。
+虽然没有办法将域名直接传递给任何 socket 函数，但 FreeBSD 的 C 库提供了 [gethostbyname(3)](https://man.freebsd.org/cgi/man.cgi?query=gethostbyname&sektion=3&format=html) 和 [gethostbyname2(3)](https://man.freebsd.org/cgi/man.cgi?query=gethostbyname2&sektion=3&format=html) 这两个函数，它们在 **netdb.h** 中声明。
 
-```
+```c
 struct hostent * gethostbyname(const char *name);
 struct hostent * gethostbyname2(const char *name, int af);
 ```
 
-两者都返回指向 hostent 结构的指针，其中包含许多关于域的信息。就我们的目的而言，结构的 h_addr_list[0] 字段指向已存储在网络字节顺序中的 h_length 字节的正确地址。
+这两个函数都会返回一个指向 `hostent` 结构体的指针，该结构体中包含大量关于该域名的信息。对我们的用途来说，该结构体中的 `h_addr_list[0]` 字段指向正确地址的 `h_length` 字节，这些字节已经是 *网络字节序*。
 
-这使我们能够创建一个更加灵活和更有用的白天程序的版本：
+这使得我们可以创建一个更加灵活——也更加实用——的 daytime 程序版本：
 
-```
+```c
 /*
  * daytime.c
  *
- * Programmed by G. Adam Stanislav
- * 19 June 2001
+ * 编写者：G. Adam Stanislav
+ * 2001 年 6 月 19 日
  */
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 
 int main(int argc, char *argv[]) {
-  register int s;
-  register int bytes;
+  int s, bytes;
   struct sockaddr_in sa;
   struct hostent *he;
   char buf[BUFSIZ+1];
@@ -731,19 +730,19 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  bzero(&sa, sizeof sa);
+  memset(&sa, '\0', sizeof(sa));
 
   sa.sin_family = AF_INET;
   sa.sin_port = htons(13);
 
-  host = (argc > 1) ? (char *)argv[1] : "time.nist.gov";
+  host = (argc > 1) ? argv[1] : "time.nist.gov";
 
   if ((he = gethostbyname(host)) == NULL) {
     herror(host);
     return 2;
   }
 
-  bcopy(he->h_addr_list[0],&sa.sin_addr, he->h_length);
+  memcpy(&sa.sin_addr, he->h_addr_list[0], he->h_length);
 
   if (connect(s, (struct sockaddr *)&sa, sizeof sa) < 0) {
     perror("connect");
@@ -758,11 +757,11 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-现在，我们可以在命令行上输入域名（或 IP 地址，两者均可），程序将尝试连接到其白天服务器。否则，它仍将默认为 time.nist.gov 。但是，即使在这种情况下，我们也将使用 gethostbyname 而不是硬编码 192.43.244.18 。这样，即使其 IP 地址在未来发生变化，我们仍然可以找到它。
+现在我们可以在命令行中输入域名（或 IP 地址，二者皆可），程序就会尝试连接该地址的 *daytime* 服务器。否则，它仍然会默认连接 `time.nist.gov`。不过即便是这种情况，我们也使用了 `gethostbyname`，而不是硬编码 `192.43.244.18`。这样一来，即使它将来更换了 IP 地址，我们依然可以找到它。
 
-由于从您的本地服务器获取时间几乎不需要时间，您可以连续两次运行白天：首先从 time.nist.gov 获取时间，第二次从您自己的系统获取时间。然后，您可以比较结果，看看您的系统时钟是多么精确。
+由于从本地服务器获取时间几乎不花什么时间，你可以连续运行两次 daytime：第一次从 `time.nist.gov` 获取时间，第二次从你自己的系统中获取。然后你就可以比较两者的结果，看看你的系统时钟有多精确：
 
-```
+```sh
 % daytime ; daytime localhost
 
 52080 01-06-20 04:02:33 50 0 0 390.2 UTC(NIST) *
@@ -770,21 +769,21 @@ int main(int argc, char *argv[]) {
 %
 ```
 
-正如您所看到的，我的系统比 NIST 时间提前两秒。
+如你所见，我的系统时间比 NIST 时间快了两秒。
 
 ### 7.6.2. `getservbyname`
 
-有时候，您可能不确定某个服务使用了什么port。在这种情况下，getservbyname(3)函数非常方便，该函数也在 netdb.h 中声明：
+有时候你可能不确定某个服务使用的端口号。此时，[getservbyname(3)](https://man.freebsd.org/cgi/man.cgi?query=getservbyname&sektion=3&format=html) 函数就非常有用，它同样在 **netdb.h** 中声明：
 
-```
+```c
 struct servent * getservbyname(const char *name, const char *proto);
 ```
 
-结构体 servent 包含了 s_port ，其中包含了已经按网络字节顺序排列的正确port。
+`servent` 结构体包含 `s_port` 字段，其中保存了正确的端口号，且已经是 *网络字节序*。
 
-如果我们不知道白天服务的正确port，我们可以通过这种方式找到它：
+如果我们事先不知道 *daytime* 服务使用的端口，可以这样获取：
 
-```
+```c
 struct servent *se;
   ...
   if ((se = getservbyname("daytime", "tcp")) == NULL {
@@ -794,26 +793,27 @@ struct servent *se;
   sa.sin_port = se->s_port;
 ```
 
-通常您确实知道port。 但是，如果您正在开发新协议，可能会在非官方port上进行测试。 将来的某一天，您将会注册协议及其port（如果不在别处，在您的 / etc / services 中至少会有 getservbyname ）。 在上述代码中，而不是返回错误，您只需使用临时port号码。 一旦您在 / etc / services 中列出了协议，您的软件将自动找到其port，而无需重新编写代码。
+通常你是知道端口号的。但如果你正在开发一个新的协议，可能会在一个非官方端口上测试它。某一天，你会为该协议和它的端口注册编号（哪怕只是写进你的 **/etc/services** 文件中，`getservbyname` 正是查这个文件）。在上述代码中你也可以不返回错误，而是临时指定一个端口号。一旦你将协议列入 **/etc/services**，你的软件就能自动找到对应端口，而无需重写代码。
+
 
 ## 7.7. 并发服务器
 
-与顺序服务器不同，并发服务器必须能够同时为多个客户端提供服务。例如，聊天服务器可能会为特定客户端提供几个小时的服务，它不能等到停止为一个客户端提供服务后再为下一个客户端提供服务。
+与顺序服务器不同，*并发服务器* 必须能够同时为多个客户端提供服务。例如，一个 *聊天服务器* 可能会为某个特定客户端服务几个小时——它不能等这个客户端断开了，才去服务下一个客户端。
 
-这要求我们的流程图有显著变化：
+这就要求我们对流程图进行重大改动：
 
 ![serv2](https://docs.freebsd.org/images/books/developers-handbook/serv2.png)
 
-图 11. 并发服务器
+**图 11. 并发服务器**
 
-我们将服务器从守护进程移动到自己的服务器进程中。但是，由于每个子进程继承所有打开的文件（而套接字被视为文件），新进程不仅继承了“已接受句柄”即 accept 调用返回的套接字，还继承了顶部套接字，即顶部进程在一开始打开的套接字。
+我们将 *服务逻辑* 从 *守护进程* 中移到了独立的 *服务进程* 中。但由于每个子进程会继承所有已打开的文件（socket 被视为一种文件），新进程不仅会继承由 `accept` 返回的 *连接句柄*，也会继承由顶层进程最初创建的 *监听 socket*。
 
-但是，服务器进程不需要此套接字，应立即 close 。同样，守护进程不再需要已接受的套接字，不仅应该，而且必须 close 它，否则，迟早会耗尽可用的文件描述符。
+但 *服务进程* 并不需要这个监听 socket，因此应立即对它执行 `close` 操作。同样地，*守护进程* 也不再需要连接 socket，不仅应当关闭它，而且 *必须* 关闭——否则迟早会耗尽可用的 *文件描述符*。
 
-在服务器进程完成服务后，应关闭已接受的套接字。它现在退出，而不是返回 accept 。
+当 *服务进程* 完成服务后，它应关闭连接 socket。此时不再返回 `accept`，而是直接退出。
 
-在 UNIX®下，一个进程并不真正退出。相反，它会返回给其父进程。通常，父进程会等待其子进程，并获取返回值。然而，我们的守护进程不能简单地停止并等待。那样会背离创建额外进程的初衷。但如果它永远不这样做，其子进程将变成僵尸-不再起作用但仍然在系统中游荡。
+在 UNIX® 中，进程实际上并不会真正 *退出*，而是会 *返回* 给它的父进程。通常父进程会调用 `wait` 来等待其子进程，并获取其返回值。但我们的 *守护进程* 不能就此停止并等待子进程完成。否则就违背了创建多个子进程的初衷。但如果它永远不调用 `wait`，子进程就会变成 \*僵尸进程（zombie）\*——虽然不再起作用，但仍残留在系统中。
 
-出于这个原因，守护进程需要在其初始化守护进程阶段设置信号处理程序。至少要处理一个 SIGCHLD 信号，这样守护进程可以从系统中移除僵尸返回值，并释放它们占用的系统资源。
+因此，*守护进程* 需要在 *初始化阶段* 设置 *信号处理器*。至少要处理 SIGCHLD 信号，以便清除子进程的返回值，并释放它们占用的系统资源。
 
-这就是为什么我们的流程图现在包含一个处理信号的框，它不连接到任何其他框。顺便说一句，许多服务器也处理 SIGHUP 信号，并通常解释为超级用户发出的信号，告诉它们应重新读取其配置文件。这使我们能够在无需终止和重新启动这些服务器的情况下更改设置。
+这也正是为什么流程图中多了一个不连接任何其他模块的 *处理信号* 方框。顺便说一句，许多服务器还会处理 SIGHUP 信号，并通常将其解释为超级用户发出的“重新读取配置文件”的信号。这样我们就可以更改设置，而不必杀掉并重启这些服务器。
