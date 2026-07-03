@@ -168,11 +168,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### 6. 同步 `SUMMARY.md`
 
-更新 `SUMMARY.md` 中所有受影响章节的 `* [标题](路径)` 条目：章号、目录路径前缀、文件名前缀。`mu-lu.md` 由 `mulu.yml` CI 工作流自动同步，**不要手动编辑**。
+更新 `SUMMARY.md` 中所有受影响章节的 `* [标题](路径)` 条目：章号、目录路径前缀、文件名前缀。
 
 ### 7. 验证
 
-重新运行 `script/compare_structure_v2.py`，确认总差异数为 0。各章节 H2/H3/H4 数量与英文原版完全一致。
+人工复核 `SUMMARY.md` 与 `en/book.adoc` 结构一致，确认各章节 H2/H3/H4 数量与英文原版完全一致。
 
 ### 8. 子节层级修复
 
