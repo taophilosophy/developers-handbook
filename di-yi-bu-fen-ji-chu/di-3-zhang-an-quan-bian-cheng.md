@@ -68,7 +68,7 @@ int main() {
 
 #### 3.3.2.1. 基于编译器的运行时边界检查
 
-不幸的是，目前仍有大量公开使用的代码在不使用我们刚才讨论的任何边界复制例程的情况下盲目地进行内存拷贝。幸运的是，存在一种方式可以帮助防止此类攻击 —— 运行时边界检查，这由多种 C/C++ 编译器实现。
+不幸的是，目前仍有大量公开使用的代码在不使用我们刚才讨论的任何边界复制例程的情况下盲目地进行内存复制。幸运的是，存在一种方式可以帮助防止此类攻击 —— 运行时边界检查，这由多种 C/C++ 编译器实现。
 
 ProPolice 就是一种这样的编译器特性，它集成于 [gcc(1)](https://man.freebsd.org/cgi/man.cgi?query=gcc&sektion=1&format=html) 4.1 及更高版本中。它取代并扩展了早期的 StackGuard [gcc(1)](https://man.freebsd.org/cgi/man.cgi?query=gcc&sektion=1&format=html) 扩展。
 

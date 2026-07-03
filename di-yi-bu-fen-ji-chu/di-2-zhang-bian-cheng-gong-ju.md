@@ -240,7 +240,7 @@ Tcl 是一种可嵌入的解释型语言，因其良好的跨平台特性而得�
   strcpy(foo, "bang!");
   ```
 
-  指针将具有一些随机值，运气好的话，它会指向一个程序无法访问的内存区域，内核会在程序产生任何损害之前终止它。如果运气不好，它可能会指向你程序内部的某个地方，破坏你的数据结构，导致程序神秘地失败。
+  指针将具有一些随机值，运气好的话，它会指向一个程序无法访问的内存区域，内核会在程序造成任何损害之前终止它。如果运气不好，它可能会指向你程序内部的某个地方，破坏你的数据结构，导致程序神秘地失败。
 
 * 尝试访问数组末尾之外的元素，例如：
 
@@ -277,7 +277,7 @@ Tcl 是一种可嵌入的解释型语言，因其良好的跨平台特性而得�
 
 #### 2.4.2.4. 有时当我得到一个 core dump 时，它说是 bus error。我在 UNIX® 书上看到说这意味着硬件问题，但电脑似乎还在工作。这是真的吗？
 
-不，幸运的是不是（当然，除非你真的遇到了硬件问题…）。这通常是指你以不应有的方式访问了内存。
+不，幸运的是，并非如此（当然，除非你真的遇到了硬件问题…）。这通常是指你以不应有的方式访问了内存。
 
 #### 2.4.2.5. 这个 core dump 的过程看起来很有用，如果我能在需要时使其发生就好了。我可以这样做吗，还是只能等到出错？
 
@@ -327,7 +327,7 @@ Tcl 是一种可嵌入的解释型语言，因其良好的跨平台特性而得�
 
 也许我们可以将这两种方法结合起来，写一个 shell 脚本，其中包含某种神奇的规则，指示何时需要编译源文件。现在，我们需要一个可以理解这些规则的程序，因为这些规则对于 shell 来说有些复杂。
 
-这个程序就是 `make`。它读取一个名为 *makefile* 的文件，文件中指定了不同文件之间的依赖关系，并根据这些规则计算哪些文件需要重新编译，哪些不需要。例如，某个规则可能会说：“如果 **fromboz.o** 比 **fromboz.c** 旧，说明 **fromboz.c** 可能被修改过，所以需要重新编译。”makefile 还会包含告诉 make 如何重新编译源文件的规则，这使它成为一个非常强大的工具。
+这个程序就是 `make`。它读取一个名为 *makefile* 的文件，文件中指定了不同文件之间的依赖关系，并根据这些规则计算哪些文件需要重新编译，哪些不需要。例如，某个规则可能会说：“如果 **fromboz.o** 比 **fromboz.c** 旧，说明 **fromboz.c** 一定被修改过，所以需要重新编译。”makefile 还会包含告诉 make 如何重新编译源文件的规则，这使它成为一个非常强大的工具。
 
 makefile 通常保存在与其适用的源文件相同的目录中，并且可以命名为 **makefile**、**Makefile** 或 **MAKEFILE**。大多数程序员使用 **Makefile** 这个名字，因为它在目录列表的顶部，更容易被发现。^\[[5](https://docs.freebsd.org/en/books/developers-handbook/tools/#_footnotedef_5 "查看脚注。")]^
 
@@ -410,7 +410,7 @@ foo.o: foo.c foo.h
 
 ### 2.5.4. FreeBSD Makefile
 
-编写 Makefile 可能相当复杂。幸运的是，基于 BSD 的系统，如 FreeBSD，提供了一些非常强大的 Makefile，这些文件是系统的一部分。一个很好的例子就是 FreeBSD 的 Ports 系统。以下是一个典型的 port **Makefile** 的核心部分：
+编写 Makefile 可能相当复杂。幸运的是，基于 BSD 的系统，如 FreeBSD，提供了一些非常强大的 Makefile，这些文件是系统的一部分。一个很好的例子就是 FreeBSD 的 Ports 系统。以下是一个典型的 Port **Makefile** 的核心部分：
 
 ```make
 MASTER_SITES=   ftp://freefall.cdrom.com/pub/FreeBSD/LOCAL_PORTS/
@@ -419,15 +419,15 @@ DISTFILES=      scheme-microcode+dist-7.3-freebsd.tgz
 .include <bsd.port.mk>
 ```
 
-现在，如果我们进入该 port 的目录并输入 `make`，会发生以下几件事：
+现在，如果我们进入该 Port 的目录并输入 `make`，会发生以下几件事：
 
-1. 系统检查此 port 的源代码是否已经存在。
+1. 系统检查此 Port 的源代码是否已经存在。
 2. 如果不存在，将建立与 **MASTER_SITES** 中指定的 URL 的 FTP 连接来下载源代码。
 3. 系统计算源代码的校验和，并与已知的源代码校验和进行比较，确保源代码在传输过程中没有损坏。
 4. 应用所需的任何更改，使源代码能够在 FreeBSD 上正常工作——这称为 *patching*。
 5. 进行源代码所需的特殊配置。（许多 UNIX® 程序在编译时会试图找出它们运行的 UNIX® 版本和所支持的 UNIX® 特性——在 FreeBSD 的 Ports 系统中，这些信息会提供给源代码。）
 6. 编译程序的源代码。实际上，我们进入源代码解压的目录并执行 `make`——程序自己的 makefile 已包含构建程序所需的信息。
-7. 我们现在得到了编译好的程序。如果需要，可以进行测试；当我们确认程序正常工作时，可以输入 `make install`，这会将程序和任何需要的支持文件复制到正确的位置，并在包数据库中创建条目，以便以后如果改变主意，可以轻松卸载该 port。
+7. 我们现在得到了编译好的程序。如果需要，可以进行测试；当我们确认程序正常工作时，可以输入 `make install`，这会将程序和任何需要的支持文件复制到正确的位置，并在包数据库中创建条目，以便以后如果改变主意，可以轻松卸载该 Port。
 
 现在你应该会同意，这个四行的脚本非常强大！
 
@@ -439,7 +439,7 @@ DISTFILES=      scheme-microcode+dist-7.3-freebsd.tgz
 
 `make` 是一个非常强大的工具，能做的事情远远超过上面简单示例所展示的内容。不幸的是，存在多种不同版本的 `make`，它们之间有很大差异。学习它们能做什么的最佳方式可能是阅读文档——希望本介绍已经为你提供了一个良好的基础。可以通过 [make(1)](https://man.freebsd.org/cgi/man.cgi?query=make&sektion=1&format=html) 手册页，了解更多关于变量、参数及如何使用 make 的全面讨论。
 
-许多 Ports 应用程序使用 GNU make，它提供了非常好的 “info” 页面。如果你已经安装了这些 Ports，GNU make 会自动安装为 `gmake`。它也可以作为一个独立的 port 或包安装。
+许多 Ports 应用程序使用 GNU make，它提供了非常好的 “info” 页面。如果你已经安装了这些 Ports，GNU make 会自动安装为 `gmake`。它也可以作为一个独立的 Port 或包安装。
 
 要查看 GNU make 的 info 页面，你需要编辑 **/usr/local/info** 目录下的 **dir** 文件，添加一行：
 
@@ -577,7 +577,7 @@ Process 9992 stopped
 等一下！`anint` 怎么变成了 `-5360`？它不是在 `main()` 中被设置为 `5` 吗？让我们回到 `main()` 看看。
 
 ```sh
-(lldb) up		返回到调用栈
+(lldb) up		向上移动调用栈
 frame #1: 0x000000000020130b temp`main at temp.c:9:2		lldb 显示堆栈帧
    6		int i;
    7
@@ -671,7 +671,7 @@ else if (pid == 0) {		/* 子进程 */
 
 >**注意**
 >
-> 从 LLDB 版本 12.0.0 开始，支持在 FreeBSD 上进行远程调试。使用早期 LLDB 版本的 FreeBSD release 的用户可能希望使用 [Ports 或 packages](https://docs.freebsd.org/en/books/handbook/#ports-using) 中提供的快照，如 [devel/llvm-devel](https://cgit.freebsd.org/ports/tree/devel/llvm-devel/)。
+> 所述功能自 LLDB 版本 12.0.0 起可用。使用早期 LLDB 版本的 FreeBSD release 的用户可能希望使用 [Ports 或 packages](https://docs.freebsd.org/en/books/handbook/#ports-using) 中提供的快照，如 [devel/llvm-devel](https://cgit.freebsd.org/ports/tree/devel/llvm-devel/)。
 
 从 LLDB 12.0.0 开始，FreeBSD 支持远程调试。这意味着可以在一台主机上启动 `lldb-server` 来调试程序，而交互式的 `lldb` 客户端则可以从另一台主机连接到它。
 
@@ -783,7 +783,7 @@ bazz (anint=4231) at temp.c:17			gdb 显示堆栈帧
 等一下！`anint` 怎么成了 `4231`？它不是在 `main()` 中被设置为 `5` 吗？让我们回到 `main()`，看看。
 
 ```sh
-(gdb) up					回到调用栈
+(gdb) up					向上移动调用栈
 #1  0x1625 in main () at temp.c:11		gdb 显示堆栈帧
 (gdb) p i					显示 i 的值
 $1 = 4231					gdb 显示 i 的值是 4231
@@ -884,7 +884,7 @@ else if (pid == 0) {		/* 子进程 */
 
 ### 2.7.1. Emacs
 
-Emacs 是一个高度可定制的编辑器——事实上，它已经被定制到几乎像一个操作系统而不是编辑器的程度！许多开发者和系统管理员确实几乎把所有的时间都花在 Emacs 中，只有在注销时才会离开它。
+Emacs 是一个高度可定制的编辑器——事实上，它已经被定制到更像一个操作系统而不是编辑器的程度！许多开发者和系统管理员确实几乎把所有的时间都花在 Emacs 中，只有在注销时才会离开它。
 
 在这里简要总结 Emacs 能做的所有事情几乎是不可能的，但以下是一些对开发者有用的功能：
 
@@ -899,7 +899,7 @@ Emacs 是一个高度可定制的编辑器——事实上，它已经被定制�
 
 当然，还有许多其他功能未被列出。
 
-Emacs 可以通过 FreeBSD 的 [editors/emacs](https://cgit.freebsd.org/ports/tree/editors/emacs/) port 进行安装。
+Emacs 可以通过 FreeBSD 的 [editors/emacs](https://cgit.freebsd.org/ports/tree/editors/emacs/) Port 进行安装。
 
 安装完成后，启动 Emacs，输入 `C-h t` 阅读 Emacs 教程——这意味着按住控制键，按 h 键，松开控制键，然后按 t 键。（或者，你可以使用鼠标从 **Help** 菜单中选择 **Emacs Tutorial**。）
 
@@ -1235,7 +1235,7 @@ Emacs 并没有使用专有的宏语言来进行配置，而是使用了一种�
 
 如果你只想在 **.emacs** 中使用已经支持的语言（C、C++、Perl、Lisp 和 Scheme），那是很好，但如果有一种新的语言叫做 "whizbang" 出现，充满了激动人心的功能，该怎么办呢？
 
-首先要做的是查看 whizbang 是否附带了任何可以让 Emacs 了解该语言的文件。通常这些文件的扩展名是 **.el**，即 "Emacs Lisp" 的缩写。例如，如果 whizbang 是一个 FreeBSD port，我们可以通过以下命令来查找这些文件：
+首先要做的是查看 whizbang 是否附带了任何可以让 Emacs 了解该语言的文件。通常这些文件的扩展名是 **.el**，即 "Emacs Lisp" 的缩写。例如，如果 whizbang 是一个 FreeBSD Port，我们可以通过以下命令来查找这些文件：
 
 ```sh
 % find /usr/ports/lang/whizbang -name "*.el" -print
@@ -1299,7 +1299,7 @@ Emacs 并没有使用专有的宏语言来进行配置，而是使用了一种�
 
 [1](https://docs.freebsd.org/en/books/developers-handbook/tools/#_footnoteref_1). 如果你在 shell 中运行它，可能会得到 core dump。
 
-[2](https://docs.freebsd.org/en/books/developers-handbook/tools/#_footnoteref_2). 如果你不知道，二进制排序是一种高效的排序方式，而冒泡排序则不是。
+[2](https://docs.freebsd.org/en/books/developers-handbook/tools/#_footnoteref_2). 如果你不知道，二分排序是一种高效的排序方式，而冒泡排序则不是。
 
 [3](https://docs.freebsd.org/en/books/developers-handbook/tools/#_footnoteref_3). 这背后的原因深藏在历史的迷雾中。
 
