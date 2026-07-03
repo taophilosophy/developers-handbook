@@ -18,7 +18,7 @@
    ```
    # /usr/sbin/config MYKERNEL
    ```
-2. 进入构建目录。运行 [config(8)](https://man.freebsd.org/cgi/man.cgi?query=config&sektion=8&format=html) 后，会打印出此目录的名称。
+2. 进入构建目录。如上所述运行 [config(8)](https://man.freebsd.org/cgi/man.cgi?query=config&sektion=8&format=html) 后，会打印出此目录的名称。
 
    ```
    # cd ../compile/MYKERNEL

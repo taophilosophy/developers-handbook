@@ -30,12 +30,12 @@ FreeBSD 的回归测试工具可以在 FreeBSD 源码树中的 **src/tools/regre
 * 尽量减少串口或 VGA 控制台的输出。将输出写入文件可减少抖动。（串口控制台容易成为瓶颈。）测试过程中不要触碰键盘，哪怕是空格或退格键也会影响结果。
 * 保证测试时间足够长，但不要太长。若测试太短，时间戳精度不足；若太长，温度变化和晶体频率漂移会影响结果。经验法则：不少于 1 分钟，不超过 1 小时。
 * 保持测试环境温度尽量稳定。这会影响晶体振荡器和硬盘算法。如需稳定时钟，可考虑注入稳定时钟信号。例如，使用 OCXO + PLL，并将输出注入时钟电路以替代主板晶振。联系 Poul-Henning Kamp（[phk@FreeBSD.org](mailto:phk@FreeBSD.org)）获取更多信息。
-* 每个测试至少运行 3 次，最好是“修改前”和“修改后”都运行超过 20 次。如有可能，交叉运行（例如：不要先运行 20 次“前”，再运行 20 次“后”），这样有助于识别环境因素。不要按 1:1 交替运行，而是 3:3，有助于发现交互效应。
+* 每个测试至少运行 3 次，最好是“修改前”和“修改后”代码都运行超过 20 次。如有可能，交叉运行（例如：不要先运行 20 次“前”，再运行 20 次“后”），这样有助于识别环境因素。不要按 1:1 交替运行，而是 3:3，有助于发现交互效应。
 
 推荐模式为：`bababa{bbbaaa}*`。
 这样，前 1+1 次就能初步判断趋势（若完全跑偏可及时终止测试），3+3 次可以估算标准差（决定是否值得长时间运行），后续数据可用于趋势和交互分析。
 * 使用 [ministat(1)](https://man.freebsd.org/cgi/man.cgi?query=ministat&sektion=1&format=html) 判断数值是否有统计意义。如果你忘记或从未学过标准差和 Student's T 分布，强烈推荐《Cartoon guide to statistics》，ISBN: 0062731025。
-* 不要使用后台 [fsck(8)](https://man.freebsd.org/cgi/man.cgi?query=fsck&sektion=8&format=html)，除非正在基准测试该功能。同时，在 **/etc/rc.conf** 中禁用 `background_fsck`，除非基准测试是在启动后至少延迟了 60 秒加 `fsck` 运行时间之后进行的，因为 [rc(8)](https://man.freebsd.org/cgi/man.cgi?query=rc&sektion=8&format=html) 会在启动时检查是否需要运行后台 `fsck`。
+* 不要使用后台 [fsck(8)](https://man.freebsd.org/cgi/man.cgi?query=fsck&sektion=8&format=html)，除非正在基准测试该功能。同时，在 **/etc/rc.conf** 中禁用 `background_fsck`，除非基准测试是在启动后至少延迟了 60 秒加 `fsck` 运行时间之后进行的，因为启用后台 `fsck` 时，[rc(8)](https://man.freebsd.org/cgi/man.cgi?query=rc&sektion=8&format=html) 会唤醒并检查是否需要对任何文件系统运行 `fsck`。
 同样，除非是测试快照功能，否则确保没有残留快照存在。
 * 如果基准测试表现异常差，检查是否有异常的中断源导致的中断量暴增。有报告指出部分 ACPI 版本存在“异常行为”，会产生过多中断。为诊断异常测试结果，可以用 `vmstat -i` 拍几张快照，看看有没有异常。
 * 注意内核和用户空间的优化参数，以及调试选项。很容易不小心遗漏某项，最后发现测试内容不一致。
@@ -57,9 +57,9 @@ Tinderbox 包括以下部分：
 
 ## 6.3. index.cgi 脚本
 
-**index.cgi** 脚本会生成 Tinderbox 和 tbmaster 日志的 HTML 摘要。虽然名字显示这是一个 CGI 脚本，但它也可以从命令行或 [cron(8)](https://man.freebsd.org/cgi/man.cgi?query=cron&sektion=8&format=html) 作业中运行，此时会在脚本所在目录查找日志。它可自动检测运行上下文，在作为 CGI 脚本运行时会生成 HTTP 头信息。它符合 XHTML 标准并使用 CSS 样式。
+**index.cgi** 脚本会生成 Tinderbox 和 tbmaster 日志的 HTML 摘要。虽然如名字所示，它最初被设计为 CGI 脚本，但也可以从命令行或 [cron(8)](https://man.freebsd.org/cgi/man.cgi?query=cron&sektion=8&format=html) 作业中运行，此时会在脚本所在目录查找日志。它可自动检测运行上下文，在作为 CGI 脚本运行时会生成 HTTP 头信息。它符合 XHTML 标准并使用 CSS 样式。
 
-脚本从 `main()` 开始，首先验证是否在官方 Tinderbox 网站上运行。如果不是，则会显示一页提示，并给出官方网站的链接。
+脚本从 `main()` 块开始，首先尝试验证是否在官方 Tinderbox 网站上运行。如果不是，则会显示一页提示，并给出官方网站的链接。
 
 接着，它扫描日志目录，获取存在日志文件的配置项、分支和架构清单，避免在脚本中硬编码这些列表，造成空行或空列。该信息由日志文件名提取，文件名需匹配以下格式：
 
@@ -69,9 +69,9 @@ tinderbox-$config-$branch-$arch-$machine.{brief,full}
 
 官方 Tinderbox 构建服务器使用的配置名称与其构建的分支一致。例如，`releng_8` 配置用于构建 `RELENG_8` 以及所有仍受支持的 8.x 发布分支。
 
-完成启动过程后，会为每个配置调用 `do_config()`。
+完成启动过程并成功执行后，会为每个配置调用 `do_config()`。
 
-`do_config()` 会为单个 Tinderbox 配置生成 HTML 内容。
+`do_config()` 函数会为单个 Tinderbox 配置生成 HTML 内容。
 
 它先生成表头行，然后遍历指定配置下的每个分支构建，每个分支输出一行，流程如下：
 
