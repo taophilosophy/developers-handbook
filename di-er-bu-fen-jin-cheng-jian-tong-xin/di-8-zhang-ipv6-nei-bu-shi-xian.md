@@ -90,7 +90,7 @@ TAHI 项目在 KAME STABLE 套件上进行了标准符合性测试。测试结�
 
 如果 DAD 失败，该地址将被标记为“重复”，并产生日志信息输出到 syslog（通常也会输出到控制台）。可以使用 [ifconfig(8)](https://man.freebsd.org/cgi/man.cgi?query=ifconfig&sektion=8&format=html) 查看“重复”标记。检查并处理 DAD 失败是管理员的责任。该行为应在近期得到改进。
 
-部分网络驱动在混杂模式下会将多播数据包回送给自身，即使指示不要这样做。在这种情况下，DAD 可能会失败，因为 DAD 引擎会看到来自本节点的 NS 入站数据包，并将其视为重复地址的信号。你可以查看 **sys/netinet6/nd6_nbr.c** 文件中的 `nd6_dad_timer()` 函数里用 `#if` 标记为“heuristics”的代码作为变通方案（注意，“heuristics”部分的代码不符合规范）。
+部分网络驱动会将多播数据包回送给自身，即使被指示不要这样做（尤其是在混杂模式下）。在这种情况下，DAD 可能会失败，因为 DAD 引擎会看到来自该节点自身的 NS 入站数据包，并将其视为重复地址的信号。你可以查看 **sys/netinet6/nd6_nbr.c** 文件中的 `nd6_dad_timer()` 函数里用 `#if` 标记为“heuristics”的代码作为变通方案（注意，“heuristics”部分的代码不符合规范）。
 
 邻居发现规范（RFC2461）没有说明以下情况中邻居缓存的处理方式：
 
@@ -178,7 +178,7 @@ accept_rtadv	forwarding	节点角色
 				（超出规范范围）
 ```
 
-RFC2462 第 5.5.3 (e) 节对收到的 RA 中前缀信息选项规定了验证规则，以防止主机受到恶意（或配置错误）的路由器发送极短的前缀生命周期影响。Jim Bound 曾在 ipngwg 邮件列表中提出一项更新（可在归档中查找 “(ipng 6712)”），此更新已被实现。
+RFC2462 第 5.5.3 (e) 节对收到的 RA 中前缀信息选项规定了验证规则，以防止主机受到恶意（或配置错误）的路由器通告极短前缀生命周期的影响。Jim Bound 曾在 ipngwg 邮件列表中提出一项更新（可在归档中查找 “(ipng 6712)”），此更新已被实现。
 
 关于 DAD（重复地址检测）与自动配置的关系，请参见本手册的 [23.5.1.2](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#neighbor-discovery) 节。
 
@@ -415,7 +415,7 @@ struct sockaddr_storage {
 
 当前实现遵循 XNET 定义，基于 RFC2553bis 的讨论。
 
-如果你查看多个 IPv6 实现，你会看到这两种定义。作为用户空间程序员，处理它的最便捷方式是：
+如果你查看多个 IPv6 实现，你会看到这两种定义。作为用户空间程序员，处理它的最可移植方式是：
 
 1. 确保平台上有 `ss_family` 和/或 `ss_len`，可以使用 GNU autoconf，
 2. 使用 `-Dss_family=__ss_family` 统一所有实例（包括头文件）为 `__ss_family`，或者
