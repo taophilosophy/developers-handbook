@@ -2,17 +2,17 @@
 
 ## 4.1. 编写符合 I18N 标准的程序
 
-为了让您的程序对其他语言用户更加实用，我们希望您能够按照 I18N 标准进行编程。GNU 的 gcc 编译器和像 QT、GTK 这样的图形界面库通过对字符串的特殊处理来支持 I18N。编写符合 I18N 的程序非常简单，这也使得其他人可以迅速将您的程序移植到其他语言。请参考特定库的 I18N 文档以获取更多细节。
+为了让你的程序对其他语言用户更加实用，我们希望你能够按照 I18N 标准进行编程。GNU 的 gcc 编译器和像 QT、GTK 这样的图形界面库通过对字符串的特殊处理来支持 I18N。编写符合 I18N 的程序非常简单，这也使得贡献者可以迅速将你的程序移植到其他语言。请参考特定库的 I18N 文档以获取更多细节。
 
-与普遍认知相反，编写符合 I18N 的代码其实很容易。通常这只是将您的字符串包装在特定库的函数中。此外，请确保支持宽字符或多字节字符。
+与普遍认知相反，编写符合 I18N 的代码其实很容易。通常这只是将你的字符串包装在特定库的函数中。此外，请确保支持宽字符或多字节字符。
 
 ### 4.1.1. 统一 I18N 努力的呼声
 
 我们注意到，各个国家的 I18N/L10N 工作经常在重复彼此的劳动。我们中很多人一次又一次地在低效地重复造轮子。我们希望 I18N 领域的主要群体能聚集起来，形成类似 Core Team 所负责的那种统一协作。
 
-当前，我们希望您在编写或移植 I18N 程序时，能将其发送到每个国家相关的 FreeBSD 邮件列表中进行测试。未来，我们希望创建出无需任何脏补丁即可在所有语言中工作的应用程序。
+当前，我们希望你在编写或移植 I18N 程序时，能将其发送到每个国家相关的 FreeBSD 邮件列表中进行测试。未来，我们希望创建出无需任何 dirty hack 即可在所有语言中开箱即用的应用程序。
 
-已经建立 [FreeBSD 国际化邮件列表](https://lists.freebsd.org/subscription/freebsd-i18n)。如果您是 I18N/L10N 的开发者，请将您的评论、想法、问题或您认为相关的一切内容发送到该邮件列表。
+现已建立 [FreeBSD 国际化邮件列表](https://lists.freebsd.org/subscription/freebsd-i18n)。如果你是 I18N/L10N 的开发者，请将你的评论、想法、问题或你认为相关的一切内容发送到该邮件列表。
 
 ### 4.1.2. Perl 与 Python
 
@@ -24,7 +24,7 @@ Perl 和 Python 拥有 I18N 和宽字符处理库。请在进行 I18N 编程时�
 
 ### 4.2.1. 将本地化消息组织成目录文件
 
-POSIX.1 NLS 基于目录文件（catalog file），这些文件使用所需编码格式包含本地化的消息。消息被组织成若干集合，每条消息在其所属集合中通过一个整数编号标识。目录文件的命名惯例是使用包含的语言环境名，加上 `.msg` 扩展名。例如，ISO8859-2 编码的匈牙利语消息应该存储在名为 **hu\_HU.ISO8859-2** 的文件中。
+POSIX.1 NLS 基于目录文件（catalog file），这些文件使用所需编码格式包含本地化的消息。消息被组织成若干集合，每条消息在其所属集合中通过一个整数编号标识。目录文件的命名惯例是使用包含的语言环境名，加上 `.msg` 扩展名。例如，ISO8859-2 编码的匈牙利语消息应该存储在名为 **hu_HU.ISO8859-2** 的文件中。
 
 这些目录文件是普通文本文件，包含带编号的消息。可以通过在行首添加 `$` 符号写注释。集合边界也通过特殊注释分隔，其中 `set` 关键字必须紧跟在 `$` 符号之后，然后是集合编号。例如：
 
@@ -38,11 +38,11 @@ $set 1
 15 "File not found: %s\n"
 ```
 
-语言目录文件在程序使用之前必须编译成二进制格式。这个转换通过 [gencat(1)](https://man.freebsd.org/cgi/man.cgi?query=gencat&sektion=1&format=html) 工具完成。它的第一个参数是生成的目录文件名，后续参数为输入的目录文件。也可以将本地化消息组织成多个目录文件，然后通过 [gencat(1)](https://man.freebsd.org/cgi/man.cgi?query=gencat&sektion=1&format=html) 一起处理。
+语言目录文件在程序使用之前必须编译成二进制格式。这个转换通过 [gencat(1)](https://man.freebsd.org/cgi/man.cgi?query=gencat&sektion=1&format=html) 工具完成。它的第一个参数是编译后的目录文件名，后续参数为输入的目录文件。也可以将本地化消息组织成多个目录文件，然后通过 [gencat(1)](https://man.freebsd.org/cgi/man.cgi?query=gencat&sektion=1&format=html) 一起处理。
 
 ### 4.2.2. 在源代码中使用目录文件
 
-使用这些目录文件很简单。为了使用相关函数，必须包含头文件 **nl\_types.h**。在使用目录前，需使用 [catopen(3)](https://man.freebsd.org/cgi/man.cgi?query=catopen&sektion=3&format=html) 打开目录文件。该函数接受两个参数，第一个是安装并编译后的目录文件名，通常使用程序名（如 grep），此名将用于查找编译目录文件。[catopen(3)](https://man.freebsd.org/cgi/man.cgi?query=catopen&sektion=3&format=html) 会在 **/usr/share/nls/locale/catname** 和 **/usr/local/share/nls/locale/catname** 中查找此文件，其中 `locale` 是设置的语言环境，`catname` 是目录名。
+使用这些目录文件很简单。为了使用相关函数，必须包含头文件 **nl_types.h**。在使用目录前，需使用 [catopen(3)](https://man.freebsd.org/cgi/man.cgi?query=catopen&sektion=3&format=html) 打开目录文件。该函数接受两个参数，第一个是安装并编译后的目录文件名，通常使用程序名（如 grep），此名将用于查找编译目录文件。[catopen(3)](https://man.freebsd.org/cgi/man.cgi?query=catopen&sektion=3&format=html) 会在 **/usr/share/nls/locale/catname** 和 **/usr/local/share/nls/locale/catname** 中查找此文件，其中 `locale` 是设置的语言环境，`catname` 是目录名。
 
 第二个参数是一个常量，有两个取值：
 
@@ -65,7 +65,7 @@ $set 1
 #ifdef WITHOUT_NLS
 #define getstr(n)	 nlsstr[n]
 #else
-#include nl_types.h
+#include <nl_types.h>
 
 extern nl_catd		 catalog;
 #define getstr(n)	 catgets(catalog, 1, n, nlsstr[n])
@@ -78,7 +78,7 @@ extern char		*nlsstr[];
 
 ```c
 #ifndef WITHOUT_NLS
-#include nl_types.h
+#include <nl_types.h>
 nl_catd	 catalog;
 #endif
 
@@ -92,7 +92,7 @@ char    *nlsstr[] = {
 };
 ```
 
-最后是打开、读取和关闭目录文件的实际代码片段：
+接下来是打开、读取和关闭目录文件的实际代码片段：
 
 ```c
 #ifndef WITHOUT_NLS
@@ -117,7 +117,7 @@ printf(getstr(1));
 首先，下面是一个没有使用 libc 错误信息的例子：
 
 ```c
-#include err.h
+#include <err.h>
 ...
 if (!S_ISDIR(st.st_mode))
 	errx(1, "argument is not a directory");
@@ -126,8 +126,8 @@ if (!S_ISDIR(st.st_mode))
 这个例子可以改写为通过读取 `errno` 并据此打印错误信息来输出错误：
 
 ```c
-#include err.h
-#include errno.h
+#include <err.h>
+#include <errno.h>
 ...
 if (!S_ISDIR(st.st_mode)) {
 	errno = ENOTDIR;
@@ -135,12 +135,12 @@ if (!S_ISDIR(st.st_mode)) {
 }
 ```
 
-在这个例子中，自定义字符串被省略了，因此翻译人员在本地化程序时的工作量会更少，用户在遇到这个错误时将看到熟悉的 “Not a directory” 错误信息。这条信息对他们来说可能更为熟悉。请注意，为了直接访问 `errno`，必须包含 **errno.h**。
+在这个例子中，自定义字符串被省略了，因此翻译人员在本地化程序时的工作量会更少，用户在遇到这个错误时将看到常见的 “Not a directory” 错误信息。这条信息对他们来说可能更为熟悉。请注意，为了直接访问 `errno`，必须包含 **errno.h**。
 
 值得注意的是，有些情况下 `errno` 会由前面的调用自动设置，因此不需要显式设置：
 
 ```c
-#include err.h
+#include <err.h>
 ...
 if ((p = malloc(size)) == NULL)
 	err(1, NULL);

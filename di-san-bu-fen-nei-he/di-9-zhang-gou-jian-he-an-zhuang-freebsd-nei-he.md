@@ -3,7 +3,7 @@
 
 作为内核开发人员，了解内核构建过程是必要的。调试 FreeBSD 内核时，必须能够构建一个内核。已知有两种构建内核的方法：
 
-支持的构建和安装内核的过程已在 FreeBSD 手册的 [构建和安装自定义内核](https://docs.freebsd.org/en/books/handbook/kernelconfig/#kernelconfig-building) 章节中进行了详细说明。
+支持的构建和安装内核的过程在 FreeBSD 手册的 [构建和安装自定义内核](https://docs.freebsd.org/en/books/handbook/kernelconfig/#kernelconfig-building) 章节中说明。
 
 >**注意**
 >

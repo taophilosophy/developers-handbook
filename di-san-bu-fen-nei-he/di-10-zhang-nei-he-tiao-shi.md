@@ -4,53 +4,53 @@
 
 当运行开发版内核（例如，FreeBSD-CURRENT）时，或者在极端条件下运行内核（例如，极高的负载平均值、数万个连接、异常高的并发用户数、数百个 [jail(8)](https://man.freebsd.org/cgi/man.cgi?query=jail&sektion=8&format=html) 等），或者在使用 FreeBSD-STABLE 上的新特性或设备驱动（例如 PAE）时，内核有时会发生 panic。在发生 panic 时，本章节将展示如何从崩溃中提取有用的信息。
 
-一旦内核发生 panic，系统重启是不可避免的。一旦系统重启，系统物理内存（RAM）的内容将丢失，以及在崩溃前交换设备上的任何数据。为了保存物理内存中的数据，内核使用交换设备作为在崩溃后重启时存储 RAM 中数据的临时位置。这样，在 FreeBSD 崩溃后重新启动时，可以提取内核映像并进行调试。
+一旦内核发生 panic，系统重启是不可避免的。一旦系统重启，系统物理内存（RAM）的内容将丢失，崩溃前交换设备上的任何数据也会丢失。为了保存物理内存中的数据，内核使用交换设备作为在崩溃后重启时存储 RAM 中数据的临时位置。这样，在 FreeBSD 崩溃后重新启动时，可以提取内核映像并进行调试。
 
 >**注意**
 >
-> 已配置为转储设备的交换设备仍然充当交换设备。当前不支持将转储写入非交换设备（例如磁带或 CDRW）。 “交换设备”等同于“交换分区”。
+> 已配置为转储设备的交换设备仍然充当交换设备。当前不支持将转储写入非交换设备（例如磁带或 CDRW）。“交换设备”等同于“交换分区”。
 
 有几种类型的内核崩溃转储可供选择：
 
 * 完整内存转储：包含物理内存的完整内容。
-* 小型转储：仅包含内核使用的内存页（FreeBSD 6.2 及更高版本）。
-* 文本转储：包含捕获的脚本或交互式调试器输出（FreeBSD 7.1 及更高版本）。
+* 小型转储：仅包含内核使用的内存页。
+* 文本转储：包含捕获的、脚本化的或交互式调试器输出。
 
-自 FreeBSD 7.0 起，小型转储是默认的转储类型，在大多数情况下，它会捕获完整内存转储中所有必要的信息，因为大多数问题只需要使用内核状态来进行隔离。
+小型转储是默认的转储类型，在大多数情况下，它会捕获完整内存转储中所有必要的信息，因为大多数问题只需要使用内核状态来进行隔离。
 
 ### 10.1.1. 配置转储设备
 
-在内核将其物理内存内容转储到转储设备之前，必须先配置转储设备。可以使用 [dumpon(8)](https://man.freebsd.org/cgi/man.cgi?query=dumpon&sektion=8&format=html) 命令告诉内核将内核崩溃转储保存到哪里。必须在使用 [swapon(8)](https://man.freebsd.org/cgi/man.cgi?query=swapon&sektion=8&format=html) 配置交换分区后调用 [dumpon(8)](https://man.freebsd.org/cgi/man.cgi?query=dumpon&sektion=8&format=html) 程序。这通常通过在 [rc.conf(5)](https://man.freebsd.org/cgi/man.cgi?query=rc.conf&sektion=5&format=html) 中设置 `dumpdev` 变量来处理，`dumpdev` 变量指定交换设备的路径（这是提取内核转储的推荐方式），或者设置为 `AUTO`，以使用第一个配置的交换设备。`dumpdev` 的默认值在 HEAD 中为 `AUTO`，在 RELENG\_\* 分支中更改为 `NO`（除了 RELENG\_7，仍然设置为 `AUTO`）。在 FreeBSD 9.0-RELEASE 及更高版本中，安装过程中，bsdinstall 会询问是否启用目标系统的崩溃转储。
+在内核将其物理内存内容转储到转储设备之前，必须先配置转储设备。可以使用 [dumpon(8)](https://man.freebsd.org/cgi/man.cgi?query=dumpon&sektion=8&format=html) 命令告诉内核将内核崩溃转储保存到哪里。必须在使用 [swapon(8)](https://man.freebsd.org/cgi/man.cgi?query=swapon&sektion=8&format=html) 配置交换分区后调用 [dumpon(8)](https://man.freebsd.org/cgi/man.cgi?query=dumpon&sektion=8&format=html) 程序。这通常通过在 [rc.conf(5)](https://man.freebsd.org/cgi/man.cgi?query=rc.conf&sektion=5&format=html) 中设置 `dumpdev` 变量来处理，`dumpdev` 变量指定交换设备的路径（这是提取内核转储的推荐方式），或者设置为 `AUTO`，以使用第一个配置的交换设备。`dumpdev` 的默认值在 HEAD 中为 `AUTO`，在 `RELENG_*` 分支中更改为 `NO`（除了 `RELENG_7`，仍然设置为 `AUTO`）。在 FreeBSD 9.0-RELEASE 及更高版本中，安装过程中，bsdinstall 会询问是否启用目标系统的崩溃转储。
 
 >**技巧**
 >
->  检查 **/etc/fstab** 或 [swapinfo(8)](https://man.freebsd.org/cgi/man.cgi?query=swapinfo&sektion=8&format=html)，以查看交换设备的列表。
+> 检查 **/etc/fstab** 或 [swapinfo(8)](https://man.freebsd.org/cgi/man.cgi?query=swapinfo&sektion=8&format=html)，以查看交换设备的列表。
 
 
 >**重要**
 >
->在内核崩溃之前，确保在 rc.conf(5) 中指定的 dumpdir 已经存在！
+>在内核崩溃之前，确保在 [rc.conf(5)](https://man.freebsd.org/cgi/man.cgi?query=rc.conf&sektion=5&format=html) 中指定的 `dumpdir` 已存在！
 >
 >```sh
 ># mkdir /var/crash
 ># chmod 700 /var/crash
 >```
 >
->另外，请记住，/var/crash 目录的内容是敏感的，极有可能包含诸如密码等机密信息。
+>另外，请记住，**/var/crash** 目录的内容是敏感的，极有可能包含诸如密码等机密信息。
 
 
 ### 10.1.2. 提取内核转储
 
-若内核转储已写入转储设备，必须在挂载交换设备之前提取该转储。要从转储设备提取转储，请使用 [savecore(8)](https://man.freebsd.org/cgi/man.cgi?query=savecore&sektion=8&format=html) 程序。如果在 [rc.conf(5)](https://man.freebsd.org/cgi/man.cgi?query=rc.conf&sektion=5&format=html) 中设置了 `dumpdev`，则在崩溃后的第一次多用户启动时，[savecore(8)](https://man.freebsd.org/cgi/man.cgi?query=savecore&sektion=8&format=html) 将自动调用，并且在交换设备挂载之前会被调用。提取的核心文件位置由 [rc.conf(5)](https://man.freebsd.org/cgi/man.cgi?query=rc.conf&sektion=5&format=html) 中的 `dumpdir` 值指定，默认位置是 **/var/crash**，并且文件名为 **vmcore.0**。
+若内核转储已写入转储设备，必须在挂载交换设备之前提取该转储。要从转储设备提取转储，请使用 [savecore(8)](https://man.freebsd.org/cgi/man.cgi?query=savecore&sektion=8&format=html) 程序。如果在 [rc.conf(5)](https://man.freebsd.org/cgi/man.cgi?query=rc.conf&sektion=5&format=html) 中设置了 `dumpdev`，则在崩溃后的第一次多用户启动时、交换设备挂载之前，[savecore(8)](https://man.freebsd.org/cgi/man.cgi?query=savecore&sektion=8&format=html) 将自动调用。提取的核心文件位置由 [rc.conf(5)](https://man.freebsd.org/cgi/man.cgi?query=rc.conf&sektion=5&format=html) 中的 `dumpdir` 值指定，默认位置是 **/var/crash**，并且文件名为 **vmcore.0**。
 
-如果 **/var/crash** 中已经存在一个名为 **vmcore.0** 的文件（或 `dumpdir` 设置的任何其他目录中），内核将在每次崩溃后递增尾部的数字，以避免覆盖现有的 **vmcore** 文件（例如：**vmcore.1**）。在转储保存之后，[savecore(8)](https://man.freebsd.org/cgi/man.cgi?query=savecore&sektion=8&format=html) 将始终在 **/var/crash** 中创建一个名为 **vmcore.last** 的符号链接。此符号链接可用于查找最新转储的文件名。
+如果 **/var/crash** 中已存在一个名为 **vmcore.0** 的文件（或 `dumpdir` 设置的任何其他目录中），内核将在每次崩溃后递增尾部的数字，以避免覆盖现有的 **vmcore** 文件（例如：**vmcore.1**）。在转储保存之后，[savecore(8)](https://man.freebsd.org/cgi/man.cgi?query=savecore&sektion=8&format=html) 将始终在 **/var/crash** 中创建一个名为 **vmcore.last** 的符号链接。此符号链接可用于查找最新转储的文件名。
 
 [crashinfo(8)](https://man.freebsd.org/cgi/man.cgi?query=crashinfo&sektion=8&format=html) 工具生成一个包含完整内存转储或小型转储摘要的文本文件。如果在 [rc.conf(5)](https://man.freebsd.org/cgi/man.cgi?query=rc.conf&sektion=5&format=html) 中设置了 `dumpdev`，则在 [savecore(8)](https://man.freebsd.org/cgi/man.cgi?query=savecore&sektion=8&format=html) 执行后，[crashinfo(8)](https://man.freebsd.org/cgi/man.cgi?query=crashinfo&sektion=8&format=html) 将自动调用。输出将保存到 `dumpdir` 中，文件名为 **core.txt.N**。
 
 
 >**技巧**
 >
->如果你正在测试一个新的内核，但需要启动不同的内核才能使系统恢复正常，使用引导提示符中的 -s 标志将其仅引导到单用户模式，然后执行以下步骤：
+>如果你正在测试一个新的内核，但需要启动不同的内核才能使系统恢复正常，在引导提示符下使用 `-s` 标志将其仅引导到单用户模式，然后执行以下步骤：
 >
 >```sh
 ># fsck -p
@@ -58,6 +58,8 @@
 ># savecore /var/crash /dev/ad0s1b
 ># exit                  # 退出到多用户模式
 >```
+>
+>这将指示 [savecore(8)](https://man.freebsd.org/cgi/man.cgi?query=savecore&sektion=8&format=html) 从 **/dev/ad0s1b** 提取内核转储并将内容放入 **/var/crash**。不要忘记确保目标目录 **/var/crash** 有足够的空间来存储转储。同时，也不要忘记指定正确的交换设备路径，因为它可能不同于 **/dev/ad0s1b**！
 
 ### 10.1.3. 测试内核转储配置
 
@@ -79,7 +81,7 @@ debug.kdb.panic: panic: kdb_sysctl_panic
 
 >**注意**
 >
->本节介绍 [kgdb(1)](https://man.freebsd.org/cgi/man.cgi?query=kgdb&sektion=1&format=html)。最新版本包含在 [devel/gdb](https://cgit.freebsd.org/ports/tree/devel/gdb/) 中。FreeBSD 11 及更早版本中也包含一个旧版本。
+>本节介绍 [kgdb(1)](https://man.freebsd.org/cgi/man.cgi?query=kgdb&sektion=1&format=html)。最新版本包含在 [devel/gdb](https://cgit.freebsd.org/ports/tree/devel/gdb/) 中。
 
 要进入调试器并开始从转储中获取信息，启动 kgdb：
 
@@ -219,7 +221,7 @@ options DDB
 
 然后重新构建内核。（有关如何配置 FreeBSD 内核的详细信息，请参阅 [FreeBSD 手册](https://docs.freebsd.org/en/books/handbook/)）。
 
-待 DDB 内核启动运行，你可以通过多种方式进入 DDB。首先，最早的方式是使用启动标志 `-d`。这样，内核将在调试模式下启动，并在任何设备探测之前进入 DDB。因此，你甚至可以调试设备探测/附加函数。要使用此方法，请退出加载器的启动菜单并在加载器提示符下输入 `boot -d`。
+一旦 DDB 内核启动运行，你可以通过多种方式进入 DDB。首先，最早的方式是使用启动标志 `-d`。这样，内核将在调试模式下启动，并在任何设备探测之前进入 DDB。因此，你甚至可以调试设备探测/附加函数。要使用此方法，请退出加载器的启动菜单并在加载器提示符下输入 `boot -d`。
 
 第二种方式是在系统启动后进入调试器。有两种简单的方法可以实现这一点。如果你希望从命令提示符进入调试器，只需键入以下命令：
 
@@ -286,7 +288,7 @@ show break
 s
 ```
 
-这会进入函数，但你可以让 DDB 跟踪这些函数，直到匹配的返回语句被达到，使用：
+这会进入函数，但你可以使用以下命令让 DDB 跟踪这些函数，直到到达匹配的返回语句：
 
 ```sh
 n
@@ -294,7 +296,7 @@ n
 
 >**注意**
 >
->这与 `gdb` 的 `next` 语句不同；它类似于 `gdb` 的 `finish`。多次按下 n 将导致继续执行。
+>这与 `gdb` 的 `next` 语句不同；它类似于 `gdb` 的 `finish`。多次按下 `n` 将导致继续执行。
 
 要检查内存中的数据，可以使用（例如）：
 
@@ -388,14 +390,9 @@ help
 
 强烈建议在调试会话中准备一份 [ddb(4)](https://man.freebsd.org/cgi/man.cgi?query=ddb&sektion=4&format=html) 手册的打印版。记住，在单步调试内核时，很难阅读在线手册。
 
-
-
-这将指示 [savecore(8)](https://man.freebsd.org/cgi/man.cgi?query=savecore&sektion=8&format=html) 从 /dev/ad0s1b 提取内核转储并将内容放入 /var/crash。不要忘记确保目标目录 /var/crash 有足够的空间来存储转储。同时，也不要忘记指定正确的交换设备路径，因为它可能不同于 /dev/ad0s1b！
-
-
 ## 10.4. 在线内核调试使用远程 GDB
 
-FreeBSD 内核提供了第二种 KDB 后端用于在线调试： [gdb(4)](https://man.freebsd.org/cgi/man.cgi?query=gdb&sektion=4&format=html)。这一功能自 FreeBSD 2.2 以来一直被支持，并且实际上是一个非常棒的功能。
+FreeBSD 内核提供了第二种 KDB 后端用于在线调试：[gdb(4)](https://man.freebsd.org/cgi/man.cgi?query=gdb&sektion=4&format=html)。
 
 GDB 长期以来一直支持 *远程调试*。这通过一个非常简单的协议沿着串行线进行。与上述其他调试方法不同，使用远程 GDB 需要两台机器。一台是提供调试环境的主机，包括所有源代码和带有所有符号的内核二进制文件。另一台是运行相同内核副本的目标机器（可以选择剥离调试信息）。
 
@@ -407,7 +404,7 @@ options         KDB
 options         GDB
 ```
 
-请注意，`GDB` 选项在 -STABLE 和 -RELEASE 分支的 `GENERIC` 内核中默认关闭，但在 -CURRENT 中已启用。
+请注意，`GDB` 选项在 -STABLE 和 -RELEASE 分支的 `GENERIC` 内核中默认关闭，但在 -CURRENT 中启用。
 
 构建完成后，将内核复制到目标机器并启动它。将目标机器的串行线（其 uart 设备上设置了 "flags 080"）连接到调试主机的任何串行端口。有关如何在 uart 设备上设置标志的信息，请参见 [uart(4)](https://man.freebsd.org/cgi/man.cgi?query=uart&sektion=4&format=html)。
 
@@ -459,19 +456,19 @@ kdb_enter (why=<optimized out>, msg=<optimized out>) at /usr/src/sys/kern/subr_k
 
 >**技巧**
 >
->根据所使用的编译器，一些局部变量可能会显示为空，从而无法被 `gdb` 直接检查。如果在调试过程中出现此问题，可以通过以较低的优化级别构建内核来改善某些变量的可见性。这可以通过将 `COPTFLAGS=-O1` 传递给 [make(1)](https://man.freebsd.org/cgi/man.cgi?query=make&sektion=1&format=html) 来完成。然而，某些类型的内核错误在更改优化级别时可能会表现不同（或根本不再出现）。 
+>根据所使用的编译器，一些局部变量可能会显示为 `<optimized out>`，从而无法被 `gdb` 直接检查。如果在调试过程中出现此问题，可以通过以较低的优化级别构建内核来改善某些变量的可见性。这可以通过将 `COPTFLAGS=-O1` 传递给 [make(1)](https://man.freebsd.org/cgi/man.cgi?query=make&sektion=1&format=html) 来完成。然而，某些类型的内核错误在更改优化级别时可能会表现不同（或根本不再出现）。 
 
-您可以像使用任何其他 GDB 会话一样使用此会话，包括完全访问源代码，在 Emacs 窗口中以 gud-mode 运行它（这会在另一个 Emacs 窗口中自动显示源代码）等。
+你可以像使用任何其他 GDB 会话一样使用此会话，包括完全访问源代码，在 Emacs 窗口中以 gud-mode 运行它（这会在另一个 Emacs 窗口中自动显示源代码）等。
 
 ## 10.5. 调试控制台驱动程序
 
-由于需要一个控制台驱动程序才能运行 DDB，如果控制台驱动程序本身出现故障，事情会变得更加复杂。您可能还记得使用串行控制台（通过修改启动块，或在 `Boot:` 提示符下指定 `-h`），并将标准终端连接到您的第一个串行端口。DDB 在任何配置了的控制台驱动程序上都能工作，包括串行控制台。
+由于需要一个控制台驱动程序才能运行 DDB，如果控制台驱动程序本身出现故障，事情会变得更加复杂。你可能还记得使用串行控制台（通过修改启动块，或在 `Boot:` 提示符下指定 `-h`），并将标准终端连接到你的第一个串行端口。DDB 在任何配置了的控制台驱动程序上都能工作，包括串行控制台。
 
 ## 10.6. 调试死锁
 
-您可能会遇到所谓的死锁，即系统停止执行有用的工作。在这种情况下，为了提供有帮助的错误报告，请按照前一节中所述使用 [ddb(4)](https://man.freebsd.org/cgi/man.cgi?query=ddb&sektion=4&format=html)。在报告中包括 `ps` 和 `trace` 的输出，针对怀疑的进程。
+你可能会遇到所谓的死锁，即系统停止执行有用的工作。在这种情况下，为了提供有帮助的错误报告，请按照前一节中所述使用 [ddb(4)](https://man.freebsd.org/cgi/man.cgi?query=ddb&sektion=4&format=html)。在报告中包含针对可疑进程的 `ps` 和 `trace` 输出。
 
-如果可能，考虑进行进一步调查。如果您怀疑死锁发生在 VFS 层，下面的步骤尤其有用。请将这些选项添加到内核配置文件中。
+如果可能，考虑进行进一步调查。如果你怀疑死锁发生在 VFS 层，下面的步骤尤其有用。请将这些选项添加到内核配置文件中。
 
 ```sh
 makeoptions 	DEBUG=-g
@@ -486,11 +483,11 @@ options 	DIAGNOSTIC
 
 当死锁发生时，除了 `ps` 命令的输出外，还应提供来自 `show pcpu`、`show allpcpu`、`show locks`、`show alllocks`、`show lockedvnods` 和 `alltrace` 的信息。
 
-为了获得线程进程的有意义的回溯，可以使用 `thread thread-id` 切换到线程栈，然后使用 `where` 进行回溯。
+为了获得多线程进程的有意义的回溯，可以使用 `thread thread-id` 切换到线程栈，然后使用 `where` 进行回溯。
 
 ## 10.7. 使用 Dcons 进行内核调试
 
-[dcons(4)](https://man.freebsd.org/cgi/man.cgi?query=dcons&sektion=4&format=html) 是一个非常简单的控制台驱动程序，未直接与任何物理设备连接。它仅从内核或加载程序的缓冲区读取和写入字符。由于其简单性，它在内核调试中非常有用，特别是在使用 FireWire® 设备时。目前，FreeBSD 提供了两种方式与缓冲区进行交互，使用 [dconschat(8)](https://man.freebsd.org/cgi/man.cgi?query=dconschat&sektion=8&format=html)。
+[dcons(4)](https://man.freebsd.org/cgi/man.cgi?query=dcons&sektion=4&format=html) 是一个非常简单的控制台驱动程序，未直接与任何物理设备连接。它仅从内核或加载程序的缓冲区读取和写入字符。由于其简单性，它在内核调试中非常有用，特别是在使用 FireWire® 设备时。目前，FreeBSD 提供了两种通过 [dconschat(8)](https://man.freebsd.org/cgi/man.cgi?query=dconschat&sektion=8&format=html) 从内核外部与缓冲区交互的方式。
 
 ### 10.7.1. 通过 FireWire® 使用 Dcons
 
@@ -502,8 +499,8 @@ FireWire® 设备不限于集成在主板中的设备。桌面电脑可以使用
 
 要在目标机器的内核中启用 FireWire® 和 Dcons 支持：
 
-* 确保您的内核支持 `dcons`、`dcons_crom` 和 `firewire`。`Dcons` 应该与内核静态链接。对于 `dcons_crom` 和 `firewire`，模块应该是可以的。
-* 确保启用了物理 DMA。您可能需要在 **/boot/loader.conf** 中添加 `hw.firewire.phydma_enable=1`。
+* 确保你的内核支持 `dcons`、`dcons_crom` 和 `firewire`。`Dcons` 应该与内核静态链接。对于 `dcons_crom` 和 `firewire`，模块应该是可以的。
+* 确保启用了物理 DMA。你可能需要在 **/boot/loader.conf** 中添加 `hw.firewire.phydma_enable=1`。
 * 添加调试选项。
 * 如果使用 GDB 通过 FireWire® 调试，请在 **/boot/loader.conf** 中添加 `dcons_gdb=1`。
 * 在 **/etc/ttys** 中启用 `dcons`。
@@ -558,11 +555,11 @@ hw.firewire.dcons_crom.force_console=1
 
 以下是运行 [dconschat(8)](https://man.freebsd.org/cgi/man.cgi?query=dconschat&sektion=8&format=html) 后可以使用的键盘组合：
 
-| \~**+**. | 断开连接         |
+| ~+. | 断开连接         |
 | -------- | ------------ |
-| \~       | ALT BREAK    |
-| \~       | 重置目标         |
-| \~       | 暂停 dconschat |
+| ~       | ALT BREAK    |
+| ~       | 重置目标         |
+| ~       | 暂停 dconschat |
 
 通过启动 [kgdb(1)](https://man.freebsd.org/cgi/man.cgi?query=kgdb&sektion=1&format=html) 并进行远程调试会话来附加远程 GDB：
 
@@ -581,7 +578,7 @@ kgdb -r :12345 kernel
 # conscontrol delete consolectl	# 视频/键盘
 ```
 
-存在一个适用于 [emacs(1)](https://man.freebsd.org/cgi/man.cgi?query=emacs&sektion=1&format=html) 的 GDB 模式；您需要在 **.emacs** 中添加以下内容：
+存在适用于 [emacs(1)](https://man.freebsd.org/cgi/man.cgi?query=emacs&sektion=1&format=html) 的 GDB 模式；你需要在 **.emacs** 中添加以下内容：
 
 ```sh
 (setq gud-gdba-command-name "kgdb -a -a -a -r :12345")
@@ -590,7 +587,7 @@ kgdb -r :12345 kernel
 M-x gdba
 ```
 
-对于 DDD (**devel/ddd**)，您可以使用以下命令：
+对于 DDD (**devel/ddd**)，你可以使用以下命令：
 
 ```sh
 # 远程串行协议
@@ -630,21 +627,21 @@ LANG=C ddd --debugger kgdb kernel /dev/fwmem0.2
 
 本节提供了用于调试的编译时内核选项的简要词汇表：
 
-* `options KDB`：编译内核调试器框架。`options DDB` 和 `options GDB` 需要此选项。几乎没有性能开销。默认情况下，当系统发生 panic 时，调试器会被触发，而不是自动重启。
-* `options KDB_UNATTENDED`：将 `debug.debugger_on_panic` sysctl 的默认值更改为 0，该 sysctl 控制系统在 panic 时是否进入调试器。如果内核中未编译 `options KDB`，则默认行为是在 panic 时自动重启；如果编译了 `options KDB`，默认行为是在没有编译 `options KDB_UNATTENDED` 的情况下进入调试器。如果希望将内核调试器保留在内核中，但希望系统在不进行诊断时能够恢复，除非您能使用调试器，使用此选项。
+* `options KDB`：编译内核调试器框架。`options DDB` 和 `options GDB` 需要此选项。几乎没有性能开销。默认情况下，系统发生 panic 时会进入调试器，而不是自动重启。
+* `options KDB_UNATTENDED`：将 `debug.debugger_on_panic` sysctl 的默认值更改为 0，该 sysctl 控制系统在 panic 时是否进入调试器。如果内核中未编译 `options KDB`，则默认行为是在 panic 时自动重启；如果编译了 `options KDB`，默认行为是在没有编译 `options KDB_UNATTENDED` 的情况下进入调试器。如果希望保留内核中的调试器，但希望系统自动恢复，除非你人在现场使用调试器进行诊断，请使用此选项。
 * `options KDB_TRACE`：将 `debug.trace_on_panic` sysctl 的默认值更改为 1，该 sysctl 控制是否在 panic 时自动打印堆栈跟踪。尤其是在运行 `options KDB_UNATTENDED` 时，这对于在串行或 FireWire 控制台上收集基本调试信息非常有帮助，同时仍然能进行重启恢复。
 * `options DDB`：编译支持控制台调试器 DDB。此交互式调试器可以在系统的任何活动低级控制台上运行，包括视频控制台、串行控制台或 FireWire 控制台。它提供基本的集成调试功能，如堆栈跟踪、进程和线程列表、锁状态转储、虚拟内存状态、文件系统状态和内核内存管理。DDB 不需要在第二台机器上运行软件，也不需要生成核心转储或完整的调试内核符号，提供实时的内核诊断。许多错误可以仅通过 DDB 输出完全诊断。此选项依赖于 `options KDB`。
-* `options GDB`：编译支持远程调试器 GDB，可以通过串行电缆或 FireWire 进行操作。当调试器被触发时，可以附加 GDB 来检查结构内容、生成堆栈跟踪等。某些内核状态比在 DDB 中更难访问，因为 DDB 可以自动生成有用的内核状态摘要，如自动遍历锁调试或内核内存管理结构，而 GDB 需要在第二台机器上运行。另一方面，GDB 结合了内核源代码和完整的调试符号，并且能够了解完整的数据结构定义、局部变量，且可以编写脚本。此选项不要求在内核核心转储上运行 GDB。此选项依赖于 `options KDB`。
+* `options GDB`：编译支持远程调试器 GDB，可以通过串行电缆或 FireWire 进行操作。进入调试器后，可以附加 GDB 来检查结构内容、生成堆栈跟踪等。某些内核状态比在 DDB 中更难访问，因为 DDB 可以自动生成有用的内核状态摘要，如自动遍历锁调试或内核内存管理结构，而 GDB 需要在第二台机器上运行。另一方面，GDB 结合了内核源代码和完整的调试符号，并且能够了解完整的数据结构定义、局部变量，且可以编写脚本。此选项不要求在内核核心转储上运行 GDB。此选项依赖于 `options KDB`。
 * `options BREAK_TO_DEBUGGER`，`options ALT_BREAK_TO_DEBUGGER`：允许在控制台上使用中断信号或替代信号进入调试器。如果系统在没有 panic 的情况下挂起，这是进入调试器的一种有用方法。由于当前内核锁定的原因，通过串行控制台生成的中断信号在进入调试器时更为可靠，因此通常推荐使用这种方式。此选项对性能的影响很小或没有影响。
-* `options INVARIANTS`：将大量运行时断言检查和测试编译到内核中，这些检查和测试不断验证内核数据结构的完整性和内核算法的不变性。由于这些测试可能会比较耗费资源，因此默认情况下不编译，但它们有助于提供有用的“故障停止”行为，在内核数据损坏发生之前，某些类别的非预期行为会先进入调试器，使其更容易调试。这些测试包括内存擦洗和使用后释放的测试，这是影响性能的一个重要因素。此选项依赖于 `options INVARIANT_SUPPORT`。
+* `options INVARIANTS`：将大量运行时断言检查和测试编译到内核中，这些检查和测试不断验证内核数据结构的完整性和内核算法的不变性。由于这些测试可能会比较耗费资源，因此默认情况下不编译，但它们有助于提供有用的“故障停止”行为，在内核数据损坏发生之前，某些类别的非预期行为会先进入调试器，使其更容易调试。这些测试包括内存擦洗和释放后使用测试，这是影响性能的重要因素。此选项依赖于 `options INVARIANT_SUPPORT`。
 * `options INVARIANT_SUPPORT`：`options INVARIANTS` 中的许多测试需要修改的数据结构或需要定义额外的内核符号。
 * `options WITNESS`：此选项启用运行时锁定顺序跟踪和验证，是诊断死锁的宝贵工具。WITNESS 维护一个按锁类型获取的锁定顺序图，并在每次获取时检查图中是否存在循环（隐式或显式）。如果检测到循环，会生成警告并打印堆栈跟踪到控制台，表明可能发生了死锁。使用 `show locks`、`show witness` 和 `show alllocks` DDB 命令需要启用 WITNESS。此调试选项具有显著的性能开销，但可以通过使用 `options WITNESS_SKIPSPIN` 来缓解。详细文档请参见 [witness(4)](https://man.freebsd.org/cgi/man.cgi?query=witness&sektion=4&format=html)。
-* `options WITNESS_SKIPSPIN`：禁用 WITNESS 的自旋锁顺序检查。由于调度器中最常频繁地获取自旋锁，并且调度事件频繁发生，此选项可以显著加快运行 WITNESS 的系统。此选项依赖于 `options WITNESS`。
+* `options WITNESS_SKIPSPIN`：禁用 WITNESS 的自旋锁顺序检查。由于调度器中最频繁地获取自旋锁，并且调度事件频繁发生，此选项可以显著加快运行 WITNESS 的系统。此选项依赖于 `options WITNESS`。
 * `options WITNESS_KDB`：将 `debug.witness.kdb` sysctl 的默认值更改为 1，这会使 WITNESS 在检测到锁定顺序违规时进入调试器，而不仅仅是打印警告。此选项依赖于 `options WITNESS`。
-* `options SOCKBUF_DEBUG`：对套接字缓冲区执行广泛的运行时一致性检查，这对于调试套接字错误和协议以及与套接字交互的设备驱动中的竞争条件非常有用。此选项对网络性能有显著影响，可能会改变设备驱动中的时序。
+* `options SOCKBUF_DEBUG`：对套接字缓冲区执行广泛的运行时一致性检查，这对于调试套接字错误和协议以及与套接字交互的设备驱动中的竞争条件非常有用。此选项对网络性能有显著影响，可能会改变设备驱动程序竞争条件中的时序。
 * `options DEBUG_VFS_LOCKS`：跟踪 lockmgr/vnode 锁的锁定获取点，扩展 DDB 中 `show lockedvnods` 显示的内容。此选项对性能有可测量的影响。
-* `options DEBUG_MEMGUARD`：这是一个替代 [malloc(9)](https://man.freebsd.org/cgi/man.cgi?query=malloc&sektion=9&format=html) 的内核内存分配器，使用 VM 系统检测从分配的内存中读取或写入已释放内存。详细信息请参见 [memguard(9)](https://man.freebsd.org/cgi/man.cgi?query=memguard&sektion=9&format=html)。此选项对性能有显著影响，但在调试内核内存损坏错误时非常有用。
+* `options DEBUG_MEMGUARD`：这是一个替代 [malloc(9)](https://man.freebsd.org/cgi/man.cgi?query=malloc&sektion=9&format=html) 的内核内存分配器，使用 VM 系统检测在内存释放后对其的读取或写入操作。详细信息请参见 [memguard(9)](https://man.freebsd.org/cgi/man.cgi?query=memguard&sektion=9&format=html)。此选项对性能有显著影响，但在调试内核内存损坏错误时非常有用。
 * `options DIAGNOSTIC`：启用附加的、较为昂贵的诊断测试，类似于 `options INVARIANTS`。
-* `options KASAN`：启用内核地址消毒器（Kernel Address Sanitizer）。这启用编译器插桩，用于检测内核中的无效内存访问，如使用后释放和缓冲区溢出。此选项在很大程度上取代了 `options DEBUG_MEMGUARD`。有关详细信息，请参见 [kasan(9)](https://man.freebsd.org/cgi/man.cgi?query=kasan&sektion=9&format=html)，以及当前支持的平台。
+* `options KASAN`：启用内核地址消毒器（Kernel Address Sanitizer）。这启用编译器插桩，用于检测内核中的无效内存访问，如释放后使用和缓冲区溢出。此选项在很大程度上取代了 `options DEBUG_MEMGUARD`。有关详细信息，请参见 [kasan(9)](https://man.freebsd.org/cgi/man.cgi?query=kasan&sektion=9&format=html)，以及当前支持的平台。
 * `options KMSAN`：启用内核内存消毒器（Kernel Memory Sanitizer）。这启用编译器插桩，用于检测未初始化内存的使用。有关详细信息，请参见 [kmsan(9)](https://man.freebsd.org/cgi/man.cgi?query=kmsan&sektion=9&format=html)，以及当前支持的平台。
 

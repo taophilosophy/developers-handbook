@@ -8,13 +8,13 @@
 
 FreeBSD 提供了一个优秀的开发环境。C 和 C++ 编译器以及汇编器随基本系统一同提供，更不用说像 `sed` 和 `awk` 这样的经典 UNIX® 工具了。如果这还不够，Ports 中还有许多其他编译器和解释器可供选择。下一节 [编程简介](https://docs.freebsd.org/en/books/developers-handbook/tools/#tools-programming) 列出了一些可用的选项。FreeBSD 与 POSIX®、ANSI C 等标准以及自身的 BSD 传统高度兼容，因此你可以编写在多种平台上几乎无需修改即可编译和运行的应用程序。
 
-然而，如果你从未在 UNIX® 平台上编写过程序，这些强大工具在最初可能会令人感到困惑。本文档的目标是帮助你快速上手，而不深入涉及高级主题。我们希望本文档能为你提供足够的基础知识，使你能够理解相关文档的内容。
+然而，如果你从未在 UNIX® 平台上编写过程序，这些强大工具在最初可能会令人感到困惑。本文档的目标是帮助你快速上手，而不深入涉及高级主题。本文档旨在为你提供足够的基础知识，使你能够理解相关文档的内容。
 
 大多数内容几乎不需要任何编程知识，尽管它假设你对 UNIX® 的基本操作已有一定掌握，并且愿意学习！
 
 ## 2.3. 编程简介
 
-程序是一组指令，告诉计算机执行各种操作；有时它要执行的指令还取决于之前执行某条指令时发生了什么。本节将概述你可以给出这些指令（通常称为“命令”）的两种主要方式：一种是使用 *解释器*，另一种是使用 *编译器*。由于人类语言对于计算机来说太复杂，难以实现明确理解，因此这些命令通常以专门为此设计的语言编写。
+程序是一组指令，告诉计算机执行各种操作；有时它要执行的指令还取决于之前执行某条指令时发生了什么。本节将概述你可以给出这些指令（通常称为“命令”）的两种主要方式：一种是使用 *解释器*，另一种是使用 *编译器*。由于人类语言对于计算机来说太复杂，难以无歧义地理解，因此这些命令通常以专门为此设计的语言编写。
 
 ### 2.3.1. 解释器
 
@@ -22,7 +22,7 @@ FreeBSD 提供了一个优秀的开发环境。C 和 C++ 编译器以及汇编�
 
 这种方式的优点在于你可以立即看到命令的执行结果，错误也可以快速修正。最大的缺点是在你想与他人分享程序时，对方必须拥有相同的解释器，或者你必须以某种方式提供给他们这个解释器，并且他们还需要知道如何使用它。此外，用户在按错键后直接进入调试器的情况，可能也会让人不太舒服。从性能角度来看，解释器通常消耗较多内存，生成的代码效率也不如编译器高。
 
-我认为，如果你从未编程过，解释型语言是最好的入门方式。这类环境典型地见于 Lisp、Smalltalk、Perl 和 Basic 等语言。也有人认为 UNIX® 的 shell（如 `sh`、`csh`）本身就是一种解释器，事实上很多人确实会编写 shell “脚本”来辅助完成他们机器上的各种“维护”任务。实际上，UNIX® 最初的理念之一就是提供许多可以在 shell 脚本中组合使用的小型实用程序，以完成有用的任务。
+我认为，如果你从未编程过，解释型语言是最好的入门方式。这类环境的典型代表是 Lisp、Smalltalk、Perl 和 Basic 等语言。也有人认为 UNIX® 的 shell（如 `sh`、`csh`）本身就是一种解释器，事实上很多人确实会编写 shell “脚本”来辅助完成他们机器上的各种“维护”任务。实际上，UNIX® 最初的理念之一就是提供许多可以在 shell 脚本中组合使用的小型实用程序，以完成有用的任务。
 
 ### 2.3.2. FreeBSD 提供的解释器
 
@@ -31,58 +31,58 @@ FreeBSD 提供了一个优秀的开发环境。C 和 C++ 编译器以及汇编�
 关于如何获取和安装 Ports 中的应用程序，可以参考手册中的 [Ports 部分](https://docs.freebsd.org/en/books/handbook/#ports-using)。
 
 **BASIC**
-BASIC 是 “Beginner’s All-purpose Symbolic Instruction Code”（初学者通用符号指令代码） 的缩写。它在 20 世纪 50 年代被开发出来，用于教授大学生编程；而在 20 世纪 80 年代，每台自重的个人计算机都配备了 BASIC，使它成为许多程序员的第一门编程语言。它也是 Visual Basic 的基础。
+BASIC 是 “Beginner’s All-purpose Symbolic Instruction Code”（初学者通用符号指令代码） 的缩写。它在 20 世纪 50 年代被开发出来，用于教授大学生编程；而在 20 世纪 80 年代，每台像样的个人计算机都配备了 BASIC，使它成为许多程序员的第一门编程语言。它也是 Visual Basic 的基础。
 
-Bywater Basic 解释器可以在 FreeBSD 的 Port 中找到，位置是 [lang/bwbasic](https://cgit.freebsd.org/ports/tree/lang/bwbasic/)，Phil Cockroft 编写的 Basic 解释器（原名 Rabbit Basic）则位于 [lang/pbasic](https://cgit.freebsd.org/ports/tree/lang/pbasic/)。
+Bywater Basic 解释器可以在 FreeBSD 的 Ports 中找到，位置是 [lang/bwbasic](https://cgit.freebsd.org/ports/tree/lang/bwbasic/)，Phil Cockroft 编写的 Basic 解释器（原名 Rabbit Basic）则位于 [lang/pbasic](https://cgit.freebsd.org/ports/tree/lang/pbasic/)。
 
 **Lisp**
 Lisp 是在 20 世纪 50 年代末期开发的一种语言，用于替代当时流行的“数值计算”语言。它不是基于数字，而是基于列表；事实上，其名称就是 “List Processing”（列表处理） 的缩写。它在人工智能（AI）领域中非常流行。
 
 Lisp 是一种极其强大而复杂的语言，但可能显得庞大且不易掌握。
 
-在 FreeBSD 的 Port 中提供了多种可在 UNIX® 系统上运行的 Lisp 实现。Bruno Haible 和 Michael Stoll 编写的 CLISP 可在 [lang/clisp](https://cgit.freebsd.org/ports/tree/lang/clisp/) 找到；一个更为简化的 Lisp 实现 SLisp 可在 [lang/slisp](https://cgit.freebsd.org/ports/tree/lang/slisp/) 找到。
+在 FreeBSD 的 Ports 中提供了多种可在 UNIX® 系统上运行的 Lisp 实现。Bruno Haible 和 Michael Stoll 编写的 CLISP 可在 [lang/clisp](https://cgit.freebsd.org/ports/tree/lang/clisp/) 找到；一个更为简化的 Lisp 实现 SLisp 可在 [lang/slisp](https://cgit.freebsd.org/ports/tree/lang/slisp/) 找到。
 
 **Perl**
 Perl 在系统管理员中非常流行，用于编写脚本；它也常用于 Web 服务器上编写 CGI 脚本。
 
-Perl 可在 FreeBSD 的 Port 中找到，位置是 [lang/perl5.36](https://cgit.freebsd.org/ports/tree/lang/perl5.36/)，适用于所有 FreeBSD 发行版。
+Perl 可在 FreeBSD 的 Ports 中找到，位置是 [lang/perl5.36](https://cgit.freebsd.org/ports/tree/lang/perl5.36/)，适用于所有 FreeBSD 发行版。
 
 **Scheme**
 Scheme 是 Lisp 的方言，它比 Common Lisp 更紧凑、更清晰。在大学中很受欢迎，因为它足够简单，可以作为初学者的第一门语言教学，同时抽象程度也高，适合用于科研工作。
 
-可在 Port 中的 [lang/elk](https://cgit.freebsd.org/ports/tree/lang/elk/) 找到 Elk Scheme 解释器；MIT Scheme 解释器位于 [lang/mit-scheme](https://cgit.freebsd.org/ports/tree/lang/mit-scheme/)，SCM Scheme 解释器则位于 [lang/scm](https://cgit.freebsd.org/ports/tree/lang/scm/)。
+可在 Ports 中的 [lang/elk](https://cgit.freebsd.org/ports/tree/lang/elk/) 找到 Elk Scheme 解释器；MIT Scheme 解释器位于 [lang/mit-scheme](https://cgit.freebsd.org/ports/tree/lang/mit-scheme/)，SCM Scheme 解释器则位于 [lang/scm](https://cgit.freebsd.org/ports/tree/lang/scm/)。
 
 **Lua**
-Lua 是一种轻量级的可嵌入脚本语言。它具有良好的可移植性，结构也相对简单。Lua 可在 Port 中通过 [lang/lua54](https://cgit.freebsd.org/ports/tree/lang/lua54/) 获取。它也被包含在 base 系统中，路径为 **/usr/libexec/flua**，用于 base 系统组件。第三方软件不应依赖 **flua**。
+Lua 是一种轻量级的可嵌入脚本语言。它具有良好的可移植性，结构也相对简单。Lua 可在 Ports 中通过 [lang/lua54](https://cgit.freebsd.org/ports/tree/lang/lua54/) 获取。它也被包含在基础系统中，路径为 **/usr/libexec/flua**，用于基础系统组件。第三方软件不应依赖 **flua**。
 
 **Python**
 Python 是一种面向对象的解释型语言。它的支持者认为这是一门非常适合初学者的语言，因为它容易上手，但并不像其他用于开发大型复杂应用的解释型语言那样受到限制（Perl 和 Tcl 是另外两种常用于此类开发的语言）。
 
-可在 Port 中通过 [lang/python](https://cgit.freebsd.org/ports/tree/lang/python/) 获取Python 的最新版本。
+可在 Ports 中通过 [lang/python](https://cgit.freebsd.org/ports/tree/lang/python/) 获取 Python 的最新版本。
 
 **Ruby**
 Ruby 是一种解释型的纯面向对象编程语言。它因其易于理解的语法、编写灵活性强以及便于开发与维护大型复杂程序而广受欢迎。
 
-可在 Port 中通过 [lang/ruby32](https://cgit.freebsd.org/ports/tree/lang/ruby32/) 获取 Ruby。
+可在 Ports 中通过 [lang/ruby32](https://cgit.freebsd.org/ports/tree/lang/ruby32/) 获取 Ruby。
 
 **Tcl 和 Tk**
 Tcl 是一种可嵌入的解释型语言，因其良好的跨平台特性而得到广泛应用和普及。它既可用于快速编写小型原型应用，也可与 Tk（一个图形用户界面工具包）结合开发功能完备的正式程序。
 
-多个版本的 Tcl 可作为 FreeBSD 的 Port 提供。最新版本 Tcl 8.7 可在 [lang/tcl87](https://cgit.freebsd.org/ports/tree/lang/tcl87/) 找到。
+多个版本的 Tcl 可作为 FreeBSD 的 Ports 提供。最新版本 Tcl 8.7 可在 [lang/tcl87](https://cgit.freebsd.org/ports/tree/lang/tcl87/) 找到。
 
 ### 2.3.3. 编译器
 
 编译器与解释器有很大不同。首先，你需要使用编辑器在文件中编写代码（一个或多个文件）。然后运行编译器，看看它是否接受你的程序。如果没有编译成功，咬紧牙关，返回编辑器进行修改；如果编译成功并生成了程序，你可以在 shell 命令提示符下运行它，或者在调试器中运行，以查看它是否正常工作。^\[[1](https://docs.freebsd.org/en/books/developers-handbook/tools/#_footnotedef_1 "查看脚注。")]^
 
-显然，这种方式不像使用解释器那样直接。然而，它允许你做很多用解释器很难甚至不可能完成的事情，比如编写与操作系统密切交互的代码——甚至编写你自己的操作系统！如果你需要编写高效的代码，它也非常有用，因为编译器可以花时间优化代码，而解释器则无法接受这种优化。此外，为编译器编写的程序通常比为解释器编写的程序更易于分发——你只需要给他们一个可执行文件副本，前提是他们使用的操作系统与你相同。
+显然，这种方式不像使用解释器那样直接。然而，它允许你做很多用解释器很难甚至不可能完成的事情，比如编写与操作系统密切交互的代码——甚至编写你自己的操作系统！如果你需要编写高效的代码，它也非常有用，因为编译器可以花时间优化代码，而这对解释器来说是不可接受的。此外，为编译器编写的程序通常比为解释器编写的程序更易于分发——你只需要给他们一个可执行文件副本，前提是他们使用的操作系统与你相同。
 
 由于使用单独程序进行编辑-编译-运行-调试的周期相当繁琐，许多商业编译器制造商已经开发了集成开发环境（简称 IDE）。FreeBSD 的基础系统中不包括 IDE，但 [devel/kdevelop](https://cgit.freebsd.org/ports/tree/devel/kdevelop/) 在 Ports Collection 中可以找到，许多人也使用 Emacs 来实现这个目的。关于如何使用 Emacs 作为 IDE，请参见 [Using Emacs as a Development Environment](https://docs.freebsd.org/en/books/developers-handbook/tools/#emacs)。
 
 ## 2.4. 使用 `cc` 编译
 
-本节介绍了 FreeBSD 基础系统中安装的 clang 编译器用于 C 和 C++ 的情况。Clang 被安装为 `cc`；GNU 编译器 [gcc](https://cgit.freebsd.org/ports/tree/lang/gcc/) 在 Ports Collection 中也可以找到。使用解释器生成程序的详细过程因解释器而异，通常在解释器的文档和在线帮助中有很好的介绍。
+本节讨论 FreeBSD 基础系统中安装的用于 C 和 C++ 的 clang 编译器。Clang 被安装为 `cc`；GNU 编译器 [gcc](https://cgit.freebsd.org/ports/tree/lang/gcc/) 在 Ports Collection 中也可以找到。使用解释器生成程序的详细过程因解释器而异，通常在解释器的文档和在线帮助中有很好的介绍。
 
-一旦你编写完你的杰作，下一步就是将它转换成能够（希望！）在 FreeBSD 上运行的形式。这通常涉及几个步骤，每个步骤都由一个独立的程序完成。
+一旦你完成了杰作，下一步就是将它转换成能够（希望！）在 FreeBSD 上运行的形式。这通常涉及几个步骤，每个步骤都由一个独立的程序完成。
 
 1. 预处理你的源代码，移除注释并进行其他操作，如在 C 中展开宏。
 2. 检查你的代码的语法，查看你是否遵循了语言的规则。如果没有，它会报错！
@@ -90,7 +90,7 @@ Tcl 是一种可嵌入的解释型语言，因其良好的跨平台特性而得�
 4. 将汇编语言转换为机器代码——是的，我们在谈论的是比特和字节，1 和 0。
 5. 检查你是否以一致的方式使用了诸如函数和全局变量之类的东西。例如，如果你调用了一个不存在的函数，它会报错。
 6. 如果你试图从多个源代码文件生成可执行文件，计算如何将它们组合在一起。
-7. 计算如何生成一个系统的运行时加载器能够加载到内存并运行的程序。
+7. 计算如何生成系统能够加载到内存并运行的程序。
 8. 最后，将可执行文件写入文件系统。
 
 “编译”一词通常仅指步骤 1 到 4，其余步骤被称为 *链接*。有时步骤 1 被称为 *预处理*，步骤 3-4 被称为 *汇编*。
@@ -129,7 +129,7 @@ Tcl 是一种可嵌入的解释型语言，因其良好的跨平台特性而得�
 这将生成一个名为 **foobar.o** 的 *目标文件*（而不是可执行文件）。可以将该目标文件与其他目标文件一起链接，生成可执行文件。
 
 `-g`
-生成可调试版本的可执行文件。这会使编译器将有关源文件和函数调用行的信息添加到可执行文件中。调试器可以利用这些信息，在你单步调试程序时显示源代码，这 *非常* 有用；缺点是这些额外的信息会使程序变得更大。通常，在开发程序时使用 `-g` 编译，而在确认程序正常工作后，则不使用 `-g` 编译“发布版本”。
+生成可调试版本的可执行文件。这会使编译器将源文件中哪一行对应哪个函数调用的信息添加到可执行文件中。调试器可以利用这些信息，在你单步调试程序时显示源代码，这 *非常* 有用；缺点是这些额外的信息会使程序变得更大。通常，在开发程序时使用 `-g` 编译，而在确认程序正常工作后，则不使用 `-g` 编译“发布版本”。
 
 ```sh
 % cc -g foobar.c
@@ -346,7 +346,7 @@ foo: foo.c
 
 创建行以一个制表符开始（按下 tab 键），然后是你在命令行中输入的命令，来创建 **foo**。如果 **foo** 已过期，或者不存在，`make` 就会执行这个命令来创建它。换句话说，这就是告诉 make 如何重新编译 **foo.c** 的规则。
 
-因此，当你输入 `make` 时，`make` 会确保 **foo** 与你对 **foo.c** 的最新更改保持同步。这个原理可以扩展到有数百个目标的 **Makefile**——实际上，在 FreeBSD 上，你只需在合适的目录中输入 `make world` 就可以编译整个操作系统！
+因此，当你输入 `make` 时，`make` 会确保 **foo** 与你对 **foo.c** 的最新更改保持同步。这个原理可以扩展到有数百个目标的 **Makefile**——实际上，在 FreeBSD 上，只需在 src 树的顶层目录中输入 `make buildworld buildkernel` 就可以编译整个操作系统！
 
 makefile 的另一个有用特点是，目标不一定非得是程序。例如，我们可以有一个像这样的 makefile：
 
@@ -410,7 +410,7 @@ foo.o: foo.c foo.h
 
 ### 2.5.4. FreeBSD Makefile
 
-编写 Makefile 可能相当复杂。幸运的是，基于 BSD 的系统，如 FreeBSD，提供了一些非常强大的 Makefile，这些文件是系统的一部分。一个很好的例子就是 FreeBSD 的 ports 系统。以下是一个典型的 ports **Makefile** 的核心部分：
+编写 Makefile 可能相当复杂。幸运的是，基于 BSD 的系统，如 FreeBSD，提供了一些非常强大的 Makefile，这些文件是系统的一部分。一个很好的例子就是 FreeBSD 的 Ports 系统。以下是一个典型的 port **Makefile** 的核心部分：
 
 ```
 MASTER_SITES=   ftp://freefall.cdrom.com/pub/FreeBSD/LOCAL_PORTS/
@@ -419,15 +419,15 @@ DISTFILES=      scheme-microcode+dist-7.3-freebsd.tgz
 .include <bsd.port.mk>
 ```
 
-现在，如果我们进入该端口的目录并输入 `make`，会发生以下几件事：
+现在，如果我们进入该 port 的目录并输入 `make`，会发生以下几件事：
 
-1. 系统检查此端口的源代码是否已经存在。
-2. 如果不存在，将建立与 MASTER\_SITES 中指定的 URL 的 FTP 连接来下载源代码。
+1. 系统检查此 port 的源代码是否已经存在。
+2. 如果不存在，将建立与 **MASTER_SITES** 中指定的 URL 的 FTP 连接来下载源代码。
 3. 系统计算源代码的校验和，并与已知的源代码校验和进行比较，确保源代码在传输过程中没有损坏。
 4. 应用所需的任何更改，使源代码能够在 FreeBSD 上正常工作——这称为 *patching*。
-5. 进行源代码所需的特殊配置。（许多 UNIX® 程序在编译时会试图找出它们运行的 UNIX® 版本和所支持的 UNIX® 特性——在 FreeBSD 的 ports 系统中，这些信息会被提供给源代码。）
+5. 进行源代码所需的特殊配置。（许多 UNIX® 程序在编译时会试图找出它们运行的 UNIX® 版本和所支持的 UNIX® 特性——在 FreeBSD 的 Ports 系统中，这些信息会提供给源代码。）
 6. 编译程序的源代码。实际上，我们进入源代码解压的目录并执行 `make`——程序自己的 makefile 已包含构建程序所需的信息。
-7. 我们现在得到了编译好的程序。如果需要，可以进行测试；当我们确认程序正常工作时，可以输入 `make install`，这会将程序和任何需要的支持文件复制到正确的位置，并在 `package database` 中创建条目，以便以后如果改变主意，可以轻松卸载该端口。
+7. 我们现在得到了编译好的程序。如果需要，可以进行测试；当我们确认程序正常工作时，可以输入 `make install`，这会将程序和任何需要的支持文件复制到正确的位置，并在包数据库中创建条目，以便以后如果改变主意，可以轻松卸载该 port。
 
 现在你应该会同意，这个四行的脚本非常强大！
 
@@ -453,7 +453,7 @@ DISTFILES=      scheme-microcode+dist-7.3-freebsd.tgz
 
 ### 2.6.1. 可用调试器简介
 
-使用调试器可以在更受控的环境下运行程序。通常，您可以逐行执行程序，检查变量的值，修改变量，指示调试器运行到某个特定位置后停止，等等。还可以附加到一个正在运行的程序，或加载核心文件以调查程序崩溃的原因。
+使用调试器可以在更受控的环境下运行程序。通常，可以逐行执行程序，检查变量的值，修改变量，指示调试器运行到某个特定位置后停止，等等。还可以附加到一个正在运行的程序，或加载 core 文件以调查程序崩溃的原因。
 
 本节旨在提供使用调试器的简要介绍，不涵盖诸如内核调试等专业话题。有关详细信息，请参阅 [内核调试](https://docs.freebsd.org/en/books/developers-handbook/kerneldebug/#kerneldebug)。
 
@@ -527,7 +527,7 @@ This is my program
 anint = -5360
 ```
 
-这不是预期的结果！该是时候看看发生了什么了！
+这不是预期的结果！是时候看看发生了什么！
 
 ```sh
 % lldb -- temp
@@ -609,11 +609,11 @@ main() {
 >每次我们进入或退出一个函数时，`lldb` 命令都会显示堆栈帧，即使我们使用 `up` 和 `down` 移动调用栈时也是如此。这会显示函数的名称和其参数的值，帮助我们跟踪程序的运行情况。（调用栈是程序存储传递给函数的参数和返回时要跳转的位置的存储区域。）
 
 
-#### 2.6.2.3. 使用 lldb 检查核心文件
+#### 2.6.2.3. 使用 lldb 检查 core 文件
 
-核心文件基本上是包含程序崩溃时完整状态的文件。在“好老的日子里”，程序员需要打印出核心文件的十六进制清单，并为机器代码手册而苦苦挣扎，但现在生活变得容易多了。顺便提一下，在 FreeBSD 和其他 4.4BSD 系统中，核心文件被称为 **progname.core**，而不是仅仅叫 **core**，以便更清楚地表明核心文件属于哪个程序。
+core 文件基本上是包含程序崩溃时完整状态的文件。在“过去的好时光”里，程序员需要打印出 core 文件的十六进制清单，并为机器代码手册而苦苦挣扎，但现在生活变得容易多了。顺便提一下，在 FreeBSD 和其他 4.4BSD 系统中，core 文件被称为 **progname.core**，而不是仅仅叫 **core**，以便更清楚地表明 core 文件属于哪个程序。
 
-要检查核心文件，需要在指定程序的同时指定核心文件的名称。不要像通常那样启动 `lldb`，而是输入 `lldb -c <progname>.core -- <progname>`。
+要检查 core 文件，需要在指定程序的同时指定 core 文件的名称。不要像通常那样启动 `lldb`，而是输入 `lldb -c <progname>.core -- <progname>`。
 
 调试器将显示如下内容：
 
@@ -624,7 +624,7 @@ Core file '/home/pauamma/tmp/progname.core' (x86_64) was loaded.
 (lldb)
 ```
 
-在这个例子中，程序被命名为 **progname**，因此核心文件名为 **progname.core**。调试器不会显示程序崩溃的原因或位置。为此，可以使用 `thread backtrace all`。这也会显示导致程序崩溃的函数是如何被调用的。
+在这个例子中，程序被命名为 **progname**，因此 core 文件名为 **progname.core**。调试器不会显示程序崩溃的原因或位置。为此，可以使用 `thread backtrace all`。这也会显示导致程序崩溃的函数是如何被调用的。
 
 ```sh
 (lldb) thread backtrace all
@@ -639,7 +639,7 @@ Core file '/home/pauamma/tmp/progname.core' (x86_64) was loaded.
 
 #### 2.6.2.4. 使用 lldb 附加到正在运行的程序
 
-`lldb` 的一大亮点功能是它可以附加到一个已经在运行的程序上。当然，这要求有足够的权限才能执行此操作。一个常见问题是当程序进行 `fork` 操作并希望跟踪子进程时，调试器通常只会跟踪父进程。
+`lldb` 的一大亮点功能是它可以附加到一个已经在运行的程序上。当然，这要求有足够的权限才能执行此操作。一个常见问题是，在单步调试一个会 fork 的程序并希望跟踪子进程时，调试器通常只会跟踪父进程。
 
 为此，启动另一个 `lldb`，使用 `ps` 查找子进程的进程 ID，然后在 `lldb` 中执行
 
@@ -671,7 +671,7 @@ else if (pid == 0) {		/* 子进程 */
 
 >**注意**
 >
-> 从 LLDB 版本 12.0.0 开始，支持在 FreeBSD 上进行远程调试。使用早期 LLDB 版本的 FreeBSD 版本的用户可能希望使用 [ports 或 packages](https://docs.freebsd.org/en/books/handbook/#ports-using) 中提供的快照，如 [devel/llvm-devel](https://cgit.freebsd.org/ports/tree/devel/llvm-devel/)。 
+> 从 LLDB 版本 12.0.0 开始，支持在 FreeBSD 上进行远程调试。使用早期 LLDB 版本的 FreeBSD release 的用户可能希望使用 [ports 或 packages](https://docs.freebsd.org/en/books/handbook/#ports-using) 中提供的快照，如 [devel/llvm-devel](https://cgit.freebsd.org/ports/tree/devel/llvm-devel/)。 
 
 从 LLDB 12.0.0 开始，FreeBSD 支持远程调试。这意味着可以在一台主机上启动 `lldb-server` 来调试程序，而交互式的 `lldb` 客户端则可以从另一台主机连接到它。
 
@@ -808,9 +808,9 @@ main() {
 >每次进入或退出一个函数时，`gdb` 命令都会显示堆栈帧，即使我们使用 `up` 和 `down` 来在调用栈中移动。这显示了函数的名称和其参数的值，这有助于我们跟踪当前的位置和发生了什么。（堆栈是程序存储有关传递给函数的参数以及返回时应该去哪里的信息的区域。）
 
 
-#### 2.6.4.3. 使用 gdb 检查 Core 文件
+#### 2.6.4.3. 使用 gdb 检查 core 文件
 
-Core 文件基本上是一个包含程序崩溃时完整状态的文件。在“好久以前”，程序员们不得不打印出 core 文件的十六进制清单，并靠着机器代码手册来调试，但现在生活变得轻松一些。顺便提一下，在 FreeBSD 和其他 4.4BSD 系统中，core 文件被称为 **progname.core**，而不仅仅是 **core**，这样可以更清楚地标明哪个程序的 core 文件。
+core 文件基本上是一个包含程序崩溃时完整状态的文件。在“过去的好时光”里，程序员们不得不打印出 core 文件的十六进制清单，并靠着机器代码手册来调试，但现在生活变得轻松一些。顺便提一下，在 FreeBSD 和其他 4.4BSD 系统中，core 文件被称为 **progname.core**，而不仅仅是 **core**，这样可以更清楚地标明哪个程序的 core 文件。
 
 要检查一个 core 文件，像平常一样启动 `gdb`。不过，不需要输入 `break` 或 `run`，而是输入：
 
@@ -852,7 +852,7 @@ Cannot access memory at address 0x7020796d.
 
 #### 2.6.4.4. 附加到正在运行的程序
 
-`gdb` 最酷的功能之一就是它可以附加到一个已经在运行的程序。当然，这需要足够的权限才能做到这一点。一个常见的问题是，在调试一个 fork 的程序时，想要追踪子进程，但调试器只会追踪父进程。
+`gdb` 最出色的功能之一就是它可以附加到一个已经在运行的程序。当然，这需要足够的权限才能做到这一点。一个常见的问题是，在单步调试一个会 fork 的程序并希望跟踪子进程时，调试器只会跟踪父进程。
 
 为此，可以启动另一个 `gdb`，使用 `ps` 查找子进程的 PID，然后在 `gdb` 中执行：
 
@@ -930,7 +930,7 @@ Emacs 并没有使用专有的宏语言来进行配置，而是使用了一种�
 不幸的是，这里有太多内容需要详细解释；然而，有一两个值得一提的要点。
 
 * 以 `;` 开头的所有内容都是注释，Emacs 会忽略它们。
-* 在第一行，`-<strong>- Emacs-Lisp -</strong>-` 是为了使我们能够在 Emacs 内部编辑 **.emacs** 文件，并获得所有编辑 Emacs Lisp 的高级功能。Emacs 通常会根据文件名尝试猜测这一点，但可能不会为 **.emacs** 文件正确识别。
+* 在第一行，`-*- Emacs-Lisp -*-` 是为了使我们能够在 Emacs 内部编辑 **.emacs** 文件，并获得所有编辑 Emacs Lisp 的高级功能。Emacs 通常会根据文件名尝试猜测这一点，但可能不会为 **.emacs** 文件正确识别。
 * Tab 键在某些模式下绑定到缩进功能，因此当你按下 Tab 键时，它会缩进当前的代码行。如果你想在写的内容中插入一个 Tab 字符，可以在按 Tab 键时按住控制键。
 * 该文件支持 C、C++、Perl、Lisp 和 Scheme 的语法高亮，通过从文件名猜测语言来启用。
 * Emacs 已经有一个预定义的函数 `next-error`。在编译输出窗口中，它允许你通过执行 `M-n` 从一个编译错误跳到下一个；我们定义了一个互补函数 `previous-error`，允许你通过执行 `M-p` 跳转到前一个错误。最好的功能是，`C-c C-c` 会打开发生错误的源文件并跳转到相应的行。
@@ -1297,14 +1297,14 @@ Emacs 并没有使用专有的宏语言来进行配置，而是使用了一种�
 
 ---
 
-[1](https://docs.freebsd.org/en/books/developers-handbook/tools/#_footnoteref_1). 如果你在 shell 中运行它，可能会得到核心转储。
+[1](https://docs.freebsd.org/en/books/developers-handbook/tools/#_footnoteref_1). 如果你在 shell 中运行它，可能会得到 core dump。
 
 [2](https://docs.freebsd.org/en/books/developers-handbook/tools/#_footnoteref_2). 如果你不知道，二进制排序是一种高效的排序方式，而冒泡排序则不是。
 
 [3](https://docs.freebsd.org/en/books/developers-handbook/tools/#_footnoteref_3). 这背后的原因深藏在历史的迷雾中。
 
-[4](https://docs.freebsd.org/en/books/developers-handbook/tools/#_footnoteref_4). 请注意，我们没有使用 -o 标志来指定可执行文件名，所以我们将得到一个名为 a.out 的可执行文件。生成一个名为 foobar 的调试版本留给读者自己完成！
+[4](https://docs.freebsd.org/en/books/developers-handbook/tools/#_footnoteref_4). 请注意，我们没有使用 `-o` 标志来指定可执行文件名，所以我们将得到一个名为 **a.out** 的可执行文件。生成一个名为 **foobar** 的调试版本留给读者自己完成！
 
-[5](https://docs.freebsd.org/en/books/developers-handbook/tools/#_footnoteref_5). 它们不使用 MAKEFILE 格式，因为大写字母通常用于文档文件，比如 README。
+[5](https://docs.freebsd.org/en/books/developers-handbook/tools/#_footnoteref_5). 它们不使用 **MAKEFILE** 格式，因为大写字母通常用于文档文件，比如 README。
 
-[6](https://docs.freebsd.org/en/books/developers-handbook/tools/#_footnoteref_6). 许多 Emacs 用户将他们的 EDITOR 环境设置为 emacsclient，这样每当他们需要编辑文件时，Emacs 就会启动。
+[6](https://docs.freebsd.org/en/books/developers-handbook/tools/#_footnoteref_6). 许多 Emacs 用户将他们的 EDITOR 环境设置为 `emacsclient`，这样每当他们需要编辑文件时，Emacs 就会启动。

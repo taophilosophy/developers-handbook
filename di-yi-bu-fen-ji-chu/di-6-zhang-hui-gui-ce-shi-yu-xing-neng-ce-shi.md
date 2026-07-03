@@ -11,7 +11,7 @@ FreeBSD 的回归测试工具可以在 FreeBSD 源码树中的 **src/tools/regre
 并非每次测试都能用到以下所有建议，但使用得越多，基准测试检测微小差异的能力就越强。
 
 * 禁用 APM 以及任何其他形式的时钟干预（ACPI？）。
-* 以单用户模式运行。例如，[cron(8)](https://man.freebsd.org/cgi/man.cgi?query=cron&sektion=8&format=html) 和其他守护进程只会增加干扰。[sshd(8)](https://man.freebsd.org/cgi/man.cgi?query=sshd&sektion=8&format=html) 守护进程也可能造成问题。如果测试时需要 ssh 访问，可以禁用 SSHv1 密钥重新生成，或者在测试过程中杀死 `sshd` 的父进程。
+* 以单用户模式运行。例如，[cron(8)](https://man.freebsd.org/cgi/man.cgi?query=cron&sektion=8&format=html) 和其他守护进程只会增加干扰。[sshd(8)](https://man.freebsd.org/cgi/man.cgi?query=sshd&sektion=8&format=html) 守护进程也可能造成问题。如果测试时需要 ssh 访问，可以禁用 SSHv1 密钥重新生成，或者在测试过程中杀死父 `sshd` 守护进程。
 * 不要运行 [ntpd(8)](https://man.freebsd.org/cgi/man.cgi?query=ntpd&sektion=8&format=html)。
 * 如果会产生 [syslog(3)](https://man.freebsd.org/cgi/man.cgi?query=syslog&sektion=3&format=html) 事件，可以让 [syslogd(8)](https://man.freebsd.org/cgi/man.cgi?query=syslogd&sektion=8&format=html) 读取一个空的 **/etc/syslogd.conf**，否则就不要运行它。
 * 最小化磁盘 I/O，若可行则完全避免。
@@ -20,16 +20,16 @@ FreeBSD 的回归测试工具可以在 FreeBSD 源码树中的 **src/tools/regre
 * 每次运行前用 [newfs(8)](https://man.freebsd.org/cgi/man.cgi?query=newfs&sektion=8&format=html) 重新初始化读写测试使用的文件系统，并用 [tar(1)](https://man.freebsd.org/cgi/man.cgi?query=tar&sektion=1&format=html) 或 [dump(8)](https://man.freebsd.org/cgi/man.cgi?query=dump&sektion=8&format=html) 文件进行填充。在测试开始前卸载并重新挂载，这样可以获得一致的文件系统布局。对于 worldstone 测试，这适用于 **/usr/obj**（只需用 `newfs` 重新初始化并挂载即可）。若想实现 100% 可重现性，可使用 [dd(1)](https://man.freebsd.org/cgi/man.cgi?query=dd&sektion=1&format=html) 命令从映像填充文件系统（例如：`dd if=myimage of=/dev/ad0s1h bs=1m`）。
 * 使用由 malloc 支持或预加载的 [md(4)](https://man.freebsd.org/cgi/man.cgi?query=md&sektion=4&format=html) 分区。
 * 在每次测试迭代之间重启系统，以保证状态一致。
-* 从内核中移除所有非必要的设备驱动程序。例如，如果测试中不需要 USB，就不要在内核中加入 USB。驱动程序往往有计时器在运行。
+* 从内核中移除所有非必要的设备驱动程序。例如，如果测试中不需要 USB，就不要在内核中加入 USB。已附加的驱动程序往往有计时器在运行。
 * 卸载不使用的硬件。使用 [atacontrol(8)](https://man.freebsd.org/cgi/man.cgi?query=atacontrol&sektion=8&format=html) 和 [camcontrol(8)](https://man.freebsd.org/cgi/man.cgi?query=camcontrol&sektion=8&format=html) 卸载不参与测试的磁盘。
-* 如果不是测试网络，测试前不要配置网络，或者测试结束后再将结果发出。
-* 禁用“Turbo 模式”，因为它会根据环境调整时钟频率。这意味着即使代码完全相同，基准测试结果也可能因时间、饮品甚至办公室里其他人的存在而不同。
+* 如果不是测试网络，测试前不要配置网络，或者测试结束后再将结果发送到另一台计算机。
+* 禁用“Turbo 模式”，因为它会根据环境调整时钟频率。这意味着即使代码完全相同，基准测试结果也可能因时间、喝咖啡还是汽水，甚至办公室里有多少其他人而不同。
 
 如果系统必须连接公共网络，要注意广播流量的突发峰值。虽然几乎察觉不到，但它仍然会占用 CPU 周期。多播（Multicast）也存在类似问题。
 * 将每个文件系统放在单独的磁盘上，减少因磁头寻道优化带来的抖动。
 * 尽量减少串口或 VGA 控制台的输出。将输出写入文件可减少抖动。（串口控制台容易成为瓶颈。）测试过程中不要触碰键盘，哪怕是空格或退格键也会影响结果。
 * 保证测试时间足够长，但不要太长。若测试太短，时间戳精度不足；若太长，温度变化和晶体频率漂移会影响结果。经验法则：不少于 1 分钟，不超过 1 小时。
-* 保持测试环境温度尽量稳定。这会影响晶体振荡器和硬盘算法。如需稳定时钟，可考虑注入稳定时钟信号。例如，使用 OCXO + PLL，并将输出注入主板时钟电路以替代晶振。联系 Poul-Henning Kamp（[phk@FreeBSD.org](mailto:phk@FreeBSD.org)）获取更多信息。
+* 保持测试环境温度尽量稳定。这会影响晶体振荡器和硬盘算法。如需稳定时钟，可考虑注入稳定时钟信号。例如，使用 OCXO + PLL，并将输出注入时钟电路以替代主板晶振。联系 Poul-Henning Kamp（[phk@FreeBSD.org](mailto:phk@FreeBSD.org)）获取更多信息。
 * 每个测试至少运行 3 次，最好是“修改前”和“修改后”都运行超过 20 次。如有可能，交叉运行（例如：不要先运行 20 次“前”，再运行 20 次“后”），这样有助于识别环境因素。不要按 1:1 交替运行，而是 3:3，有助于发现交互效应。
 
 推荐模式为：`bababa{bbbaaa}*`。
@@ -96,10 +96,10 @@ tinderbox-$config-$branch-$arch-$machine.{brief,full}
 配置和分支按其“分支等级”排序，排序规则如下：
 
 * `HEAD` 和 `CURRENT` 的等级为 9999。
-* `RELENG_x` 的等级为 *`xx`*99。
+* `RELENG_x` 的等级为 **xx**99。
 * `RELENG_x_y` 的等级为 *xxyy*。
 
-这意味着 `HEAD` 总是最高等级，`RELENG` 分支按数字升序排列，每个 `STABLE` 分支高于其派生的 release 分支。例如，FreeBSD 8 中的顺序为：
+这意味着 `HEAD` 总是最高等级，`RELENG` 分支按数字顺序排列，每个 `STABLE` 分支高于其派生的发布分支。例如，FreeBSD 8 中从高到低的顺序为：
 
 * `RELENG_8`（等级 899）
 * `RELENG_8_3`（等级 803）
