@@ -82,7 +82,7 @@ BSD 套接字将进程间通信提升到了一个新的层次。通信的进程�
 
 一旦你接收到数据，就由你来决定如何处理它。在我们的例子中，你需要理解 HTTP 协议和 PNG 文件结构。
 
-打个比方，所有的网络协议变成了一个灰色地带：与其说是因为我们不理解它是如何工作的，不如说是因为我们不再关注它。套接字接口为我们处理了这一灰色地带：
+打个比方，所有的网络互联协议变成了一个灰色地带：与其说是因为我们不理解它是如何工作的，不如说是因为我们不再关注它。套接字接口为我们处理了这一灰色地带：
 
 ![slayers](https://docs.freebsd.org/images/books/developers-handbook/slayers.png)
 
@@ -163,7 +163,7 @@ struct sockaddr {
  * 地址族
  */
 #define	AF_UNSPEC	0		/* 未指定 */
-#define	AF_LOCAL	1		/* 本地主机（管道、端口） */
+#define	AF_LOCAL	1		/* 本地主机（管道、门户） */
 #define	AF_UNIX		AF_LOCAL	/* 向后兼容 */
 #define	AF_INET		2		/* 互联网：UDP、TCP 等 */
 #define	AF_IMPLINK	3		/* ARPANET IMP 地址 */
@@ -191,13 +191,13 @@ struct sockaddr {
 #define	AF_SIP		24		/* 简单互联网协议 */
 #define	pseudo_AF_PIP	25		/* 帮助识别 PIP 包 */
 #define	AF_ISDN		26		/* 综合服务数字网络 */
-#define	AF_E164		AF_ISDN		/* CCITT E.164 推荐 */
+#define	AF_E164		AF_ISDN		/* CCITT E.164 建议 */
 #define	pseudo_AF_KEY	27		/* 内部密钥管理功能 */
 #define	AF_INET6	28		/* IPv6 */
 #define	AF_NATM		29		/* 原生 ATM 访问 */
 #define	AF_ATM		30		/* ATM */
-#define pseudo_AF_HDRCMPLT 31		/* BPF 用于不重写头部
-					 * 在接口输出例程中
+#define pseudo_AF_HDRCMPLT 31		/* BPF 用于在接口输出例程中
+					 * 不重写头部
 					 */
 #define	AF_NETGRAPH	32		/* Netgraph 套接字 */
 #define	AF_SLOW		33		/* 802.3ad 慢协议 */
