@@ -329,13 +329,13 @@ Tcl 是一种可嵌入的解释型语言，因其良好的跨平台特性而得�
 
 这个程序就是 `make`。它读取一个名为 *makefile* 的文件，文件中指定了不同文件之间的依赖关系，并根据这些规则计算哪些文件需要重新编译，哪些不需要。例如，某个规则可能会说：“如果 **fromboz.o** 比 **fromboz.c** 旧，说明 **fromboz.c** 可能被修改过，所以需要重新编译。”makefile 还会包含告诉 make 如何重新编译源文件的规则，这使它成为一个非常强大的工具。
 
-makefile 通常保存在与其适用的源文件相同的目录中，并且可以命名为 **makefile**、**Makefile** 或 **MAKEFILE**。大多数程序员使用 **Makefile** 这个名字，因为它在目录列表的顶部，更容易被发现。
+makefile 通常保存在与其适用的源文件相同的目录中，并且可以命名为 **makefile**、**Makefile** 或 **MAKEFILE**。大多数程序员使用 **Makefile** 这个名字，因为它在目录列表的顶部，更容易被发现。^\[[5](https://docs.freebsd.org/en/books/developers-handbook/tools/#_footnotedef_5 "查看脚注。")]^
 
 ### 2.5.2. 使用 `make` 的示例
 
 这是一个非常简单的 makefile：
 
-```c
+```make
 foo: foo.c
 	cc -o foo foo.c
 ```
@@ -350,7 +350,7 @@ foo: foo.c
 
 makefile 的另一个有用特点是，目标不一定非得是程序。例如，我们可以有一个像这样的 makefile：
 
-```c
+```make
 foo: foo.c
 	cc -o foo foo.c
 
@@ -360,7 +360,7 @@ install:
 
 我们可以通过输入以下命令告诉 `make` 我们想要创建哪个目标：
 
-```
+```sh
 % make target
 ```
 
@@ -376,7 +376,7 @@ install:
 
 C 代码通常以一系列要包含的文件开始，例如 `stdio.h`。其中一些是系统包含文件，有些则是当前项目中的文件：
 
-```
+```c
 #include <stdio.h>
 #include "foo.h"
 
@@ -385,7 +385,7 @@ int main(....
 
 为了确保一旦 **foo.h** 被修改，这个文件会立刻重新编译，你需要在 **Makefile** 中添加它：
 
-```
+```make
 foo: foo.c foo.h
 ```
 
@@ -393,14 +393,14 @@ foo: foo.c foo.h
 
 如果你在 **Makefile** 中添加以下内容：
 
-```
+```make
 depend:
 	cc -E -MM *.c > .depend
 ```
 
 并运行 `make depend`，那么会生成一个 **.depend** 文件，内容包含对象文件、C 文件和包含文件的依赖关系：
 
-```
+```make
 foo.o: foo.c foo.h
 ```
 
@@ -412,7 +412,7 @@ foo.o: foo.c foo.h
 
 编写 Makefile 可能相当复杂。幸运的是，基于 BSD 的系统，如 FreeBSD，提供了一些非常强大的 Makefile，这些文件是系统的一部分。一个很好的例子就是 FreeBSD 的 Ports 系统。以下是一个典型的 port **Makefile** 的核心部分：
 
-```
+```make
 MASTER_SITES=   ftp://freefall.cdrom.com/pub/FreeBSD/LOCAL_PORTS/
 DISTFILES=      scheme-microcode+dist-7.3-freebsd.tgz
 
@@ -439,7 +439,7 @@ DISTFILES=      scheme-microcode+dist-7.3-freebsd.tgz
 
 `make` 是一个非常强大的工具，能做的事情远远超过上面简单示例所展示的内容。不幸的是，存在多种不同版本的 `make`，它们之间有很大差异。学习它们能做什么的最佳方式可能是阅读文档——希望本介绍已经为你提供了一个良好的基础。可以通过 [make(1)](https://man.freebsd.org/cgi/man.cgi?query=make&sektion=1&format=html) 手册页，了解更多关于变量、参数及如何使用 make 的全面讨论。
 
-许多 ports 应用程序使用 GNU make，它提供了非常好的 "info" 页面。如果你已经安装了这些 ports，GNU make 会自动安装为 `gmake`。它也可以作为一个独立的端口或包安装。
+许多 Ports 应用程序使用 GNU make，它提供了非常好的 “info” 页面。如果你已经安装了这些 Ports，GNU make 会自动安装为 `gmake`。它也可以作为一个独立的 port 或包安装。
 
 要查看 GNU make 的 info 页面，你需要编辑 **/usr/local/info** 目录下的 **dir** 文件，添加一行：
 
@@ -479,13 +479,13 @@ FreeBSD 还提供了另一个调试器 `gdb`（GNU 调试器）。与 lldb 不�
 
 #### 2.6.2.2. 使用 lldb 运行程序
 
-使用 `-g` 编译程序，以便充分利用 `lldb`。即使不加 `-g` 也可以使用，但它将只显示当前正在运行的函数的名称，而不是源代码。如果它显示类似以下的行：
+使用 `-g` 编译程序，以便充分利用 `lldb`。即使不加 `-g` 也可以使用，但它将只显示当前正在运行的函数的名称，而不是源代码。如果在设置断点时显示类似以下的行：
 
 ```sh
 Breakpoint 1: where = temp`main, address = …
 ```
 
-（没有源代码文件名和行号的指示）表示程序没有使用 `-g` 编译。
+（没有源代码文件名和行号的指示）则表示程序没有使用 `-g` 编译。
 
 >**注意**
 >
@@ -671,7 +671,7 @@ else if (pid == 0) {		/* 子进程 */
 
 >**注意**
 >
-> 从 LLDB 版本 12.0.0 开始，支持在 FreeBSD 上进行远程调试。使用早期 LLDB 版本的 FreeBSD release 的用户可能希望使用 [ports 或 packages](https://docs.freebsd.org/en/books/handbook/#ports-using) 中提供的快照，如 [devel/llvm-devel](https://cgit.freebsd.org/ports/tree/devel/llvm-devel/)。 
+> 从 LLDB 版本 12.0.0 开始，支持在 FreeBSD 上进行远程调试。使用早期 LLDB 版本的 FreeBSD release 的用户可能希望使用 [Ports 或 packages](https://docs.freebsd.org/en/books/handbook/#ports-using) 中提供的快照，如 [devel/llvm-devel](https://cgit.freebsd.org/ports/tree/devel/llvm-devel/)。
 
 从 LLDB 12.0.0 开始，FreeBSD 支持远程调试。这意味着可以在一台主机上启动 `lldb-server` 来调试程序，而交互式的 `lldb` 客户端则可以从另一台主机连接到它。
 
@@ -707,7 +707,7 @@ else if (pid == 0) {		/* 子进程 */
 
 不过许多人更喜欢在 Emacs 中运行它。要在 Emacs 中运行，输入：
 
-```c
+```sh
 M-x gdb RET progname RET
 ```
 
@@ -717,7 +717,7 @@ M-x gdb RET progname RET
 
 使用 `-g` 选项编译程序，以便最大限度地发挥 gdb 的功能。即使不加 `-g` 选项，gdb 也能工作，但它只会显示当前运行的函数名称，而不是源代码。如果在启动 gdb 时看到类似以下内容：
 
-```c
+```sh
 ... (no debugging symbols found) ...
 ```
 
@@ -782,7 +782,7 @@ bazz (anint=4231) at temp.c:17			gdb 显示堆栈帧
 
 等一下！`anint` 怎么成了 `4231`？它不是在 `main()` 中被设置为 `5` 吗？让我们回到 `main()`，看看。
 
-```c
+```sh
 (gdb) up					回到调用栈
 #1  0x1625 in main () at temp.c:11		gdb 显示堆栈帧
 (gdb) p i					显示 i 的值
@@ -850,13 +850,13 @@ Cannot access memory at address 0x7020796d.
 
 `end()` 函数在程序崩溃时被调用；在这种情况下，`bazz()` 函数是从 `main()` 被调用的。
 
-#### 2.6.4.4. 附加到正在运行的程序
+#### 2.6.4.4. 使用 gdb 附加到正在运行的程序
 
 `gdb` 最出色的功能之一就是它可以附加到一个已经在运行的程序。当然，这需要足够的权限才能做到这一点。一个常见的问题是，在单步调试一个会 fork 的程序并希望跟踪子进程时，调试器只会跟踪父进程。
 
 为此，可以启动另一个 `gdb`，使用 `ps` 查找子进程的 PID，然后在 `gdb` 中执行：
 
-```
+```sh
 (gdb) attach pid
 ```
 
@@ -866,15 +866,15 @@ Cannot access memory at address 0x7020796d.
 
 ```c
 ...
-if ((pid = fork()) < 0)		/* _Always_ check this */
+if ((pid = fork()) < 0)		/* _始终_ 检查这个 */
 	error();
-else if (pid == 0) {		/* child */
+else if (pid == 0) {		/* 子进程 */
 	int PauseMode = 1;
 
 	while (PauseMode)
 		sleep(10);	/* 等待直到有人附加到我们 */
 	...
-} else {			/* parent */
+} else {			/* 父进程 */
 	...
 ```
 
@@ -899,7 +899,7 @@ Emacs 是一个高度可定制的编辑器——事实上，它已经被定制�
 
 当然，还有许多其他功能未被列出。
 
-Emacs 可以通过 FreeBSD 的 [editors/emacs](https://cgit.freebsd.org/ports/tree/editors/emacs/) 端口进行安装。
+Emacs 可以通过 FreeBSD 的 [editors/emacs](https://cgit.freebsd.org/ports/tree/editors/emacs/) port 进行安装。
 
 安装完成后，启动 Emacs，输入 `C-h t` 阅读 Emacs 教程——这意味着按住控制键，按 h 键，松开控制键，然后按 t 键。（或者，你可以使用鼠标从 **Help** 菜单中选择 **Emacs Tutorial**。）
 
@@ -1259,7 +1259,7 @@ Emacs 并没有使用专有的宏语言来进行配置，而是使用了一种�
 
 找到 **.emacs** 中的 `auto-mode-alist` 条目，然后添加一行，如下所示：
 
-```sh
+```lisp
 ...
 ("\\.lsp$" . lisp-mode)
 ("\\.wiz$" . whizbang-mode)
@@ -1271,7 +1271,7 @@ Emacs 并没有使用专有的宏语言来进行配置，而是使用了一种�
 
 接下来，在 **.emacs** 中找到 `font-lock-auto-mode-list` 条目。像这样将 `whizbang-mode` 添加到其中：
 
-```
+```lisp
 ;; 自动字体锁定模式
 (defvar font-lock-auto-mode-list
   (list 'c-mode 'c++-mode 'c++-c-mode 'emacs-lisp-mode 'whizbang-mode 'lisp-mode 'perl-mode 'scheme-mode)

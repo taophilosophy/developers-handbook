@@ -1,6 +1,5 @@
 # 第 5 章. 源代码树准则与规范
 
-
 本章记录了 FreeBSD 源码树中施行的各种指南和政策。
 
 ## 5.1. 编码风格指南
@@ -11,7 +10,7 @@
 
 如果 FreeBSD **src/** 发行版中的某个部分由某个人或一组人维护，这会通过 **src/MAINTAINERS** 文件中的一条记录来表达。Ports Collection 中某个 Port 的维护者通过在该 Port 的 **Makefile** 中添加一行 `MAINTAINER` 来向外界表明其维护权：
 
-```sh
+```make
 MAINTAINER= email-addresses
 ```
 
@@ -27,7 +26,7 @@ MAINTAINER= email-addresses
 
 ## 5.3. 引入的软件（Contributed Software）
 
-FreeBSD 发行版的一部分是由 FreeBSD 项目之外的团队维护的。出于历史原因，我们称这类软件为 *引入的软件（contributed software）*。典型例子有 LLVM、[zlib(3)](https://man.freebsd.org/cgi/man.cgi?query=zlib&sektion=3&format=html) 和 [awk(1)](https://man.freebsd.org/cgi/man.cgi?query=awk&sektion=1&format=html)。
+FreeBSD 发行版的一部分是由 FreeBSD 项目之外的团队积极维护的。出于历史原因，我们称这类软件为 *引入的软件（contributed software）*。典型例子有 LLVM、[zlib(3)](https://man.freebsd.org/cgi/man.cgi?query=zlib&sektion=3&format=html) 和 [awk(1)](https://man.freebsd.org/cgi/man.cgi?query=awk&sektion=1&format=html)。
 
 管理引入软件的标准做法是创建一个 *vendor 分支*，在该分支中可以以“干净”方式导入软件（即不加修改），并以版本控制的方式跟踪更新。然后将 vendor 分支中的内容应用到源码树中，并可进行本地修改。FreeBSD 专属的构建集成代码应保存在源码树中，而非 vendor 分支中。
 
@@ -70,7 +69,7 @@ FreeBSD 发行版的一部分是由 FreeBSD 项目之外的团队维护的。出
 
 对于 Port：
 
-* 优先使用上游已经指定的版本号。
+* 优先使用上游所指定的版本号。
 * 如果上游提供了符号版本控制（symbol versioning），应确保我们也使用其脚本。
 
 对于基础系统：
@@ -85,4 +84,4 @@ FreeBSD 发行版的一部分是由 FreeBSD 项目之外的团队维护的。出
 
 进行更改的提交者有责任处理库的版本编号。
 
-ELF 动态链接器会精确匹配库名。目前的流行做法是将库名设为 `libexample.so.x.y`，其中 x 为主版本号，y 为次版本号。惯例是将库的 soname（ELF 中的 `DT_SONAME` 标签）设为 `libexample.so.x`，并在为最新的次版本号 y 安装库时建立符号链接：`libexample.so.x → libexample.so.x.y`，`libexample.so → libexample.so.x`。这样，由于静态链接器在使用 `-lexample` 命令行选项时会搜索 `libexample.so`，因此与 libexample 链接的对象会获得对正确库的依赖。几乎所有流行的构建系统都会自动采用这种方式。
+ELF 动态链接器会精确匹配库名。目前的流行做法是将库版本号设为 `libexample.so.x.y`，其中 x 为主版本号，y 为次版本号。惯例是将库的 soname（ELF 中的 `DT_SONAME` 标签）设为 `libexample.so.x`，并在为最新的次版本号 y 安装库时建立符号链接：`libexample.so.x → libexample.so.x.y`，`libexample.so → libexample.so.x`。这样，由于静态链接器在使用 `-lexample` 命令行选项时会搜索 `libexample.so`，因此与 libexample 链接的对象会获得对正确库的依赖。几乎所有流行的构建系统都会自动采用这种方式。

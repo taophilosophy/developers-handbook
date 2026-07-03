@@ -16,11 +16,11 @@
 * 小型转储：仅包含内核使用的内存页。
 * 文本转储：包含捕获的、脚本化的或交互式调试器输出。
 
-小型转储是默认的转储类型，在大多数情况下，它会捕获完整内存转储中所有必要的信息，因为大多数问题只需要使用内核状态来进行隔离。
+小型转储是默认的转储类型，在大多数情况下，它会捕获完整内存转储中所有必要的信息，因为大多数问题仅需借助内核状态即可定位。
 
 ### 10.1.1. 配置转储设备
 
-在内核将其物理内存内容转储到转储设备之前，必须先配置转储设备。可以使用 [dumpon(8)](https://man.freebsd.org/cgi/man.cgi?query=dumpon&sektion=8&format=html) 命令告诉内核将内核崩溃转储保存到哪里。必须在使用 [swapon(8)](https://man.freebsd.org/cgi/man.cgi?query=swapon&sektion=8&format=html) 配置交换分区后调用 [dumpon(8)](https://man.freebsd.org/cgi/man.cgi?query=dumpon&sektion=8&format=html) 程序。这通常通过在 [rc.conf(5)](https://man.freebsd.org/cgi/man.cgi?query=rc.conf&sektion=5&format=html) 中设置 `dumpdev` 变量来处理，`dumpdev` 变量指定交换设备的路径（这是提取内核转储的推荐方式），或者设置为 `AUTO`，以使用第一个配置的交换设备。`dumpdev` 的默认值在 HEAD 中为 `AUTO`，在 `RELENG_*` 分支中更改为 `NO`（除了 `RELENG_7`，仍然设置为 `AUTO`）。在 FreeBSD 9.0-RELEASE 及更高版本中，安装过程中，bsdinstall 会询问是否启用目标系统的崩溃转储。
+在内核将其物理内存内容转储到转储设备之前，必须先配置转储设备。可以使用 [dumpon(8)](https://man.freebsd.org/cgi/man.cgi?query=dumpon&sektion=8&format=html) 命令告诉内核将内核崩溃转储保存到哪里。必须在使用 [swapon(8)](https://man.freebsd.org/cgi/man.cgi?query=swapon&sektion=8&format=html) 配置交换分区后调用 [dumpon(8)](https://man.freebsd.org/cgi/man.cgi?query=dumpon&sektion=8&format=html) 程序。这通常通过在 [rc.conf(5)](https://man.freebsd.org/cgi/man.cgi?query=rc.conf&sektion=5&format=html) 中设置 `dumpdev` 变量来处理，`dumpdev` 变量指定交换设备的路径（这是提取内核转储的推荐方式），或者设置为 `AUTO`，以使用第一个配置的交换设备。`dumpdev` 的默认值在 HEAD 中为 `AUTO`，在 `RELENG_*` 分支中更改为 `NO`（除了 `RELENG_7`，仍然设置为 `AUTO`）。在 FreeBSD 9.0-RELEASE 及更高版本中，bsdinstall 会在安装过程中询问是否启用目标系统的崩溃转储。
 
 >**技巧**
 >
@@ -231,7 +231,7 @@ options DDB
 
 或者，如果你在系统控制台上，可以使用键盘上的热键。默认的断点调试器快捷键是 **Ctrl**+**Alt**+**ESC**。对于 syscons，可以重新映射此快捷键，且一些分发的映射已经这样做，所以确保你知道正确的快捷键序列。如果你使用串行控制台，则可以通过串行线路上的 BREAK 信号进入 DDB（在内核配置文件中使用 `options BREAK_TO_DEBUGGER`）。这不是默认设置，因为很多串行适配器会无故生成 BREAK 信号，例如拔掉电缆时。
 
-第三种方式是任何 panic 条件都会跳转到 DDB，如果内核已配置为使用它。因此，为无人值守的机器配置带有 DDB 的内核并不明智。
+第三种方式是，如果内核已配置为使用 DDB，任何 panic 条件都会跳转到 DDB。因此，为无人值守的机器配置带有 DDB 的内核并不明智。
 
 为了获得无人值守功能，可以在内核配置文件中添加：
 
@@ -328,7 +328,7 @@ w/b termbuf 0xa 0xb 0
  w/w 0xf0010030 0 0
 ```
 
-命令修饰符（`b`/`h`/`w`）指定要写入的数据大小，第一个跟随的表达式是写入地址，剩下的被解释为写入到连续内存位置的数据。
+命令修饰符（`b`/`h`/`w`）指定要写入的数据大小，随后的第一个表达式是写入地址，其余部分被解释为写入到连续内存位置的数据。
 
 如果需要查看当前的寄存器，可以使用：
 

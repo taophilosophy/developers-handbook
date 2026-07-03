@@ -4,7 +4,7 @@
 
 BSD 套接字将进程间通信提升到了一个新的层次。通信的进程不再必须运行在同一台机器上。它们*可以*运行在同一台机器上，但不再是必须的。
 
-不仅如此，这些进程也不需要运行在相同的操作系统下。多亏了 BSD 套接字，你的 FreeBSD 软件可以顺利地与一台 Macintosh® 上运行的程序协作，与一台 Sun™ 工作站上的程序协作，甚至与一台运行 Windows® 2000 的程序协作，所有这些通过基于以太网的局域网连接在一起。
+不仅如此，这些进程也不需要运行在相同的操作系统下。多亏了 BSD 套接字，你的 FreeBSD 软件可以顺利地与一台 Macintosh® 上运行的程序协作，与一台 Sun™ 工作站上的程序协作，甚至与运行在 Windows® 2000 下的程序协作，所有这些通过基于以太网的局域网连接在一起。
 
 而你的软件同样可以与运行在另一栋楼、另一个大陆、甚至潜艇或航天飞机中的进程协作。
 
@@ -82,7 +82,7 @@ BSD 套接字将进程间通信提升到了一个新的层次。通信的进程�
 
 一旦你接收到数据，就由你来决定如何处理它。在我们的例子中，你需要理解 HTTP 协议和 PNG 文件结构。
 
-举个比喻，所有的网络协议变成了一个灰色地带：与其说是因为我们不理解它是如何工作的，不如说是因为我们不再关注它。套接字接口为我们处理了这一灰色地带：
+打个比方，所有的网络协议变成了一个灰色地带：与其说是因为我们不理解它是如何工作的，不如说是因为我们不再关注它。套接字接口为我们处理了这一灰色地带：
 
 ![slayers](https://docs.freebsd.org/images/books/developers-handbook/slayers.png)
 
@@ -90,12 +90,11 @@ BSD 套接字将进程间通信提升到了一个新的层次。通信的进程�
 
 我们只需要理解任何告诉我们如何*解释数据*的协议，而不是如何*从另一个进程接收*数据，或如何*发送*数据到另一个进程。
 
-
 ## 7.4. 套接字模型
 
 BSD 套接字是建立在基本 UNIX® 模型之上的：*一切皆文件*。在我们的例子中，套接字可以让我们接收一个*HTTP 文件*，可以这么说。然后，剩下的工作就是从中提取出*PNG 文件*。
 
-由于互联网的复杂性，我们不能简单地使用 `open` 系统调用或 `open()` C 函数。相反，我们需要采取多个步骤来“打开”一个套接字。
+由于网络互联的复杂性，我们不能简单地使用 `open` 系统调用或 `open()` C 函数。相反，我们需要采取多个步骤来“打开”一个套接字。
 
 然而，一旦我们完成这些步骤，我们就可以开始像处理任何*文件描述符*一样处理*套接字*：我们可以从中`read`、`write`、`pipe`，最后`close`它。
 
@@ -113,7 +112,7 @@ BSD 套接字是建立在基本 UNIX® 模型之上的：*一切皆文件*。在
 
 客户端和服务器都使用的一个函数是 [socket(2)](https://man.freebsd.org/cgi/man.cgi?query=socket&sektion=2&format=html)。它的声明如下：
 
-```
+```c
 int socket(int domain, int type, int protocol);
 ```
 
@@ -141,7 +140,7 @@ int socket(int domain, int type, int protocol);
 
 套接字系列的各种函数都需要一小块内存区域的地址（用 C 术语来说，即指向该区域的指针）。**sys/socket.h** 中的各种 C 声明将其称为 `struct sockaddr`。这个结构在同一个文件中声明：
 
-```
+```c
 /*
  * 内核用于存储大多数地址的结构
  */
@@ -159,14 +158,14 @@ struct sockaddr {
 
 **sys/socket.h** 将套接字所处理的各种协议称为*地址族*，并在 `sockaddr` 定义之前列出它们：
 
-```
+```c
 /*
  * 地址族
  */
 #define	AF_UNSPEC	0		/* 未指定 */
 #define	AF_LOCAL	1		/* 本地主机（管道、端口） */
 #define	AF_UNIX		AF_LOCAL	/* 向后兼容 */
-#define	AF_INET		2		/* 内联网：UDP、TCP 等 */
+#define	AF_INET		2		/* 互联网：UDP、TCP 等 */
 #define	AF_IMPLINK	3		/* ARPANET IMP 地址 */
 #define	AF_PUP		4		/* PUP 协议：如 BSP */
 #define	AF_CHAOS	5		/* MIT CHAOS 协议 */
@@ -214,7 +213,7 @@ struct sockaddr {
 
 具体来说，当*地址族*为 `AF_INET` 时，我们可以在需要 `sockaddr` 的地方使用 **netinet/in.h** 中的 `struct sockaddr_in`：
 
-```
+```c
 /*
  * 套接字地址，互联网风格。
  */
@@ -235,7 +234,7 @@ struct sockaddr_in {
 
 三个重要的字段是 `sin_family`，它是结构的第 1 字节；`sin_port`，它是 16 位的值，存储在第 2 和第 3 字节中；以及 `sin_addr`，它是一个 32 位的 IP 地址整数表示，存储在第 4 至第 7 字节中。
 
-现在，让我们尝试填充它。假设我们正在为 *daytime* 协议编写客户端，该协议简单地规定其服务器会将当前的日期和时间的文本字符串写入端口 13。我们希望使用 TCP/IP，因此我们需要在地址族字段中指定 `AF_INET`。`AF_INET` 被定义为 `2`。让我们使用 IP 地址 `192.43.244.18`，这是美国联邦政府的时间服务器（`time.nist.gov`）。
+现在，让我们尝试填充它。假设我们正在为 *daytime* 协议编写客户端，该协议简单地规定其服务器会将当前的日期和时间的文本字符串写入端口 13。我们希望使用 TCP/IP，因此我们需要在地址族字段中指定 `AF_INET`。`AF_INET` 被定义为 `2`。让我们使用 IP 地址 **132.163.96.1**，这是美国联邦政府的时间服务器（`time.nist.gov`）。
 
 ![sainfill](https://docs.freebsd.org/images/books/developers-handbook/sainfill.png)
 
@@ -243,7 +242,7 @@ struct sockaddr_in {
 
 顺便提一下，`sin_addr` 字段被声明为 `struct in_addr` 类型，它在 **netinet/in.h** 中定义：
 
-```
+```c
 /*
  * Internet 地址（出于历史原因的结构）
  */
@@ -254,16 +253,16 @@ struct in_addr {
 
 此外，`in_addr_t` 是一个 32 位的整数。
 
-`192.43.244.18` 只是通过列出其所有 8 位字节（从*最高有效*字节开始）来表示一个 32 位整数的便捷表示法。
+**132.163.96.1** 只是通过列出其所有 8 位字节（从*最高有效*字节开始）来表示一个 32 位整数的便捷表示法。
 
 到目前为止，我们已经将 `sockaddr` 视为一种抽象。我们的计算机并不会将 `short` 整数存储为单一的 16 位实体，而是作为一系列的 2 个字节。类似地，它将 32 位整数存储为一系列 4 个字节。
 
 假设我们编写了如下代码：
 
-```
+```c
 sa.sin_family      = AF_INET;
 sa.sin_port        = 13;
-sa.sin_addr.s_addr = (((((192 << 8) | 43) << 8) | 244) << 8) | 18;
+sa.sin_addr.s_addr = (((((132 << 8) | 163) << 8) | 96) << 8) | 1;
 ```
 
 结果会是什么样子呢？
@@ -279,7 +278,6 @@ sa.sin_addr.s_addr = (((((192 << 8) | 43) << 8) | 244) << 8) | 18;
 ![sainmsb](https://docs.freebsd.org/images/books/developers-handbook/sainmsb.png)
 
 **图 6. 在 MSB 系统上的 `sockaddr_in`**
-
 
 在 PDP 上，它的表现可能又会不同。但上述两种方式是如今最常见的两种实现方式。
 
@@ -326,7 +324,7 @@ sa.sin_addr.s_addr = (((((192 << 8) | 43) << 8) | 244) << 8) | 18;
 ```c
 sa.sin_family      = AF_INET;
 sa.sin_port        = 13 << 8;
-sa.sin_addr.s_addr = (((((18 << 8) | 244) << 8) | 43) << 8) | 192;
+sa.sin_addr.s_addr = (((((1 << 8) | 96) << 8) | 163) << 8) | 132;
 ```
 
 这样可以“骗过”我们的编译器，让它以 *网络字节序* 存储这些数据。在某些情况下，这确实是正确的做法（比如当你在写汇编语言的时候）。但在大多数情况下，这会引起问题。
@@ -365,7 +363,7 @@ int connect(int s, const struct sockaddr *name, socklen_t namelen);
 
 ##### 7.5.1.2.2. 我们的第一个客户端
 
-现在我们已经掌握足够知识，来编写一个非常简单的客户端程序，它将从 `192.43.244.18` 获取当前时间并打印到 **stdout**。
+现在我们已经掌握足够知识，来编写一个非常简单的客户端程序，它将从 **132.163.96.1** 获取当前时间并打印到 **stdout**。
 
 ```c
 /*
@@ -386,26 +384,25 @@ int main() {
   char buffer[BUFSIZ+1];
 
   if ((s = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
-    perror("socket");      // 打开 socket 失败
+    perror("socket");
     return 1;
   }
 
-  memset(&sa, '\0', sizeof(sa));  // 清空结构体
+  memset(&sa, '\0', sizeof(sa));
 
-  sa.sin_family = AF_INET;                  // 使用 IPv4
-  sa.sin_port = htons(13);                 // 端口号 13（daytime 服务）
-  sa.sin_addr.s_addr = htonl((((((192 << 8) | 43) << 8) | 244) << 8) | 18);  // IP 地址
-
+  sa.sin_family = AF_INET;
+  sa.sin_port = htons(13);
+  sa.sin_addr.s_addr = htonl((((((132 << 8) | 163) << 8) | 96) << 8) | 1);
   if (connect(s, (struct sockaddr *)&sa, sizeof sa) < 0) {
-    perror("connect");     // 连接失败
-    close(s);              // 关闭 socket
+    perror("connect");
+    close(s);
     return 2;
   }
 
   while ((bytes = read(s, buffer, BUFSIZ)) > 0)
-    write(1, buffer, bytes);  // 输出到标准输出
+    write(1, buffer, bytes);
 
-  close(s);  // 关闭连接
+  close(s);
   return 0;
 }
 ```
@@ -709,7 +706,7 @@ struct hostent * gethostbyname2(const char *name, int af);
 /*
  * daytime.c
  *
- * 编写者：G. Adam Stanislav
+ * G. Adam Stanislav 编写
  * 2001 年 6 月 19 日
  */
 #include <stdio.h>
@@ -759,7 +756,7 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-现在我们可以在命令行中输入域名（或 IP 地址，二者皆可），程序就会尝试连接该地址的 *daytime* 服务器。否则，它仍然会默认连接 `time.nist.gov`。不过即便是这种情况，我们也使用了 `gethostbyname`，而不是硬编码 `192.43.244.18`。这样一来，即使它将来更换了 IP 地址，我们依然可以找到它。
+现在我们可以在命令行中输入域名（或 IP 地址，二者皆可），程序就会尝试连接该地址的 *daytime* 服务器。否则，它仍然会默认连接 `time.nist.gov`。不过即便是这种情况，我们也使用了 `gethostbyname`，而不是硬编码 **132.163.96.1**。这样一来，即使它将来更换了 IP 地址，我们依然可以找到它。
 
 由于从本地服务器获取时间几乎不花什么时间，你可以连续运行两次 daytime：第一次从 `time.nist.gov` 获取时间，第二次从你自己的系统中获取。然后你就可以比较两者的结果，看看你的系统时钟有多精确：
 
@@ -796,7 +793,6 @@ struct servent *se;
 ```
 
 通常你是知道端口号的。但如果你正在开发一个新的协议，可能会在一个非官方端口上测试它。某一天，你会为该协议和它的端口注册编号（哪怕只是写进你的 **/etc/services** 文件中，`getservbyname` 正是查这个文件）。在上述代码中你也可以不返回错误，而是临时指定一个端口号。一旦你将协议列入 **/etc/services**，你的软件就能自动找到对应端口，而无需重写代码。
-
 
 ## 7.7. 并发服务器
 

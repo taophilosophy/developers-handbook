@@ -14,7 +14,7 @@ Apple、AirPort、FireWire、iMac、iPhone、iPad、Mac、Macintosh、Mac OS、Q
 
 Linux 是 Linus Torvalds 的注册商标。
 
-微软、IntelliMouse、MS-DOS、Outlook、Windows、Windows Media 和 Windows NT 分别是微软公司在美国和/或其他国家/地区的注册商标或商标。
+微软、IntelliMouse、MS-DOS、Outlook、Windows、Windows Media 和 Windows NT 是微软公司在美国和/或其他国家/地区的注册商标或商标。
 
 Motif、OSF/1 和 UNIX 是 The Open Group 在美国和其他国家的注册商标，IT DialTone 和 The Open Group 也是 The Open Group 在美国和其他国家的商标。
 
