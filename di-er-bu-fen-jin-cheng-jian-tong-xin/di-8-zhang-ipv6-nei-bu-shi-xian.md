@@ -22,7 +22,7 @@ TAHI 项目在 KAME STABLE 套件上进行了标准符合性测试。测试结�
 
   * 不支持 IPv4 兼容地址。
   * 不支持自动隧道（RFC 第 4.3 节中描述）。
-  * [gif(4)](https://man.freebsd.org/cgi/man.cgi?query=gif&sektion=4&format=html) 接口以通用方式实现了 `IPv[46]-over-IPv[46]` 隧道，覆盖了该规范中的“配置隧道”。详情见本文件第 [23.5.1.5](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#gif) 节。
+  * [gif(4)](https://man.freebsd.org/cgi/man.cgi?query=gif&sektion=4&format=html) 接口以通用方式实现了 `IPv[46]-over-IPv[46]` 隧道，覆盖了该规范中的“配置隧道”。详情见本文件的 [通用隧道接口](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#gif) 一节。
 * RFC1981：IPv6 的路径 MTU 发现
 * RFC2080：IPv6 的 RIPng
 
