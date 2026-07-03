@@ -231,7 +231,7 @@ gif 可以配置为支持 ECN（显式拥塞通知）友好行为。关于隧道
 % ping -6 -b 70000 -s 68000 ::1
 ```
 
-IPv6 规范要求，如果数据包中携带了分片头，则不得使用巨大负载选项。如果违反此规定，必须向发送方发送 ICMPv6 参数问题消息。尽管规范如此，但通常无法看到由于此要求引发的 ICMPv6 错误。
+IPv6 规范要求，如果数据包中携带了分片头，则不得使用巨大负载选项。如果违反此规定，必须向发送方发送 ICMPv6 参数问题消息。我们遵循了规范，但通常看不到由此要求引发的 ICMPv6 错误。
 
 当收到 IPv6 数据包时，会检查数据帧长度并与 IPv6 头中的负载长度字段或巨大负载选项中的长度（如果有）进行比较。如果前者小于后者，则丢弃数据包并增加统计计数。你可以通过 [netstat(8)](https://man.freebsd.org/cgi/man.cgi?query=netstat&sektion=8&format=html) 命令与 `-s -p ip6` 选项查看统计信息：
 
@@ -257,7 +257,7 @@ IPsec 不支持巨大负载。这是因为在支持 AH（认证头）与巨大�
 
 #### 8.1.1.8. 头部处理中的循环防止
 
-IPv6 规范允许将任意数量的扩展头添加到数据包中。如果我们按照 BSD 的 IPv4 代码实现 IPv6 数据包处理，内核堆栈可能会因为长时间的函数调用链而导致溢出。**sys/netinet6** 代码经过精心设计，避免了内核堆栈溢出，因此 **sys/netinet6** 代码定义了自己的协议切换结构，即 `struct ip6protosw`（参见 **netinet6/ip6protosw.h**）。IPv4 部分（**sys/netinet**）没有进行类似的更新以保持兼容性，但它对 `pr_input()` 原型进行了小幅修改。因此，`struct ipprotosw` 也被定义了。结果是，如果接收到带有大量 IPsec 头的 IPsec-over-IPv4 数据包，内核堆栈可能会溢出。但 IPsec-over-IPv6 是安全的。（当然，为了处理这些 IPsec 头，每个 IPsec 头必须通过每个 IPsec 检查，因此匿名攻击者无法利用这种攻击。）
+IPv6 规范允许将任意数量的扩展头添加到数据包中。如果我们按照 BSD 的 IPv4 代码实现 IPv6 数据包处理，内核堆栈可能会因为过长的函数调用链而导致溢出。**sys/netinet6** 代码经过精心设计，避免了内核堆栈溢出，因此 **sys/netinet6** 代码定义了自己的协议切换结构，即 `struct ip6protosw`（参见 **netinet6/ip6protosw.h**）。IPv4 部分（**sys/netinet**）没有进行类似的更新以保持兼容性，但它对 `pr_input()` 原型进行了小幅修改。因此，`struct ipprotosw` 也被定义了。结果是，如果接收到带有大量 IPsec 头的 IPsec-over-IPv4 数据包，内核堆栈可能会溢出。但 IPsec-over-IPv6 是安全的。（当然，为了处理这些 IPsec 头，每个 IPsec 头必须通过每个 IPsec 检查，因此匿名攻击者无法利用这种攻击。）
 
 #### 8.1.1.9. ICMPv6
 
@@ -557,7 +557,7 @@ RFC2401         将所有 TOS 位从内层复制到外层   丢弃外层的 TOS 
 ECN forbidden   将除了 ECN 外的所有 TOS 位复制   丢弃外层的 TOS 位（按原样使用内层 TOS 位）
                 （与 0xfc 相掩码）从内层复制到外层  将 ECN 位设置为 0。
 
-ECN allowed     将除了 ECN 外的所有 TOS 位复制   使用内层 TOS 位，并做一些修改。如果外层 ECN CE 位
+ECN allowed     将除了 ECN CE 外的所有 TOS 位复制   使用内层 TOS 位，并做一些修改。如果外层 ECN CE 位
                 （与 0xfe 相掩码）从内层复制到外层   为 1，则在内层启用 ECN CE 位
                 将 ECN CE 位设置为 0。              。
 ```
