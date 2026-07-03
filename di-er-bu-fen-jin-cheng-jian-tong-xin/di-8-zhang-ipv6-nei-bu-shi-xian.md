@@ -66,10 +66,10 @@ TAHI 项目在 KAME STABLE 套件上进行了标准符合性测试。测试结�
 * RFC2497：ARCnet 网络上的 IPv6 分组传输
 * RFC2553：IPv6 的基本套接字接口扩展
 
-  * 支持 IPv4 映射地址（第 3.7 节）和 IPv6 通配绑定套接字的特殊行为（第 3.8 节）。详情见本文件第 [23.5.1.12](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#ipv6-wildcard-socket) 节。
+  * 支持 IPv4 映射地址（第 3.7 节）和 IPv6 通配绑定套接字的特殊行为（第 3.8 节）。详情见本文件的 [IPv4 映射地址与 IPv6 通配符套接字](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#ipv6-wildcard-socket) 一节。
 * RFC2675：IPv6 Jumbo 报文
 
-  * 详情见本文件第 [23.5.1.7](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#ipv6-jumbo) 节。
+  * 详情见本文件的 [巨大负载](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#ipv6-jumbo) 一节。
 * RFC2710：IPv6 的多播监听器发现（MLD）
 * RFC2711：IPv6 路由器提醒选项
 * **draft-ietf-ipngwg-router-renum-08**：IPv6 路由器重新编号
@@ -81,7 +81,7 @@ TAHI 项目在 KAME STABLE 套件上进行了标准符合性测试。测试结�
 * **draft-itojun-ipv6-tcp-to-anycast-00**：断开面向 IPv6 Anycast 地址的 TCP 连接
 * **draft-yamamoto-wideipv6-comm-model-00**
 
-  * 详情见本文件第 [23.5.1.6](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#ipv6-sas) 节。
+  * 详情见本文件的 [源地址选择](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#ipv6-sas) 一节。
 * **draft-ietf-ipngwg-scopedaddr-format-00.txt**：IPv6 作用域地址格式扩展
 
 #### 8.1.1.2. 邻居发现
@@ -180,7 +180,7 @@ accept_rtadv	forwarding	节点角色
 
 RFC2462 第 5.5.3 (e) 节对收到的 RA 中前缀信息选项规定了验证规则，以防止主机受到恶意（或配置错误）的路由器通告极短前缀生命周期的影响。Jim Bound 曾在 ipngwg 邮件列表中提出一项更新（可在归档中查找 “(ipng 6712)”），此更新已被实现。
 
-关于 DAD（重复地址检测）与自动配置的关系，请参见本手册的 [23.5.1.2](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#neighbor-discovery) 节。
+关于 DAD（重复地址检测）与自动配置的关系，请参见本手册的 [邻居发现](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#neighbor-discovery) 一节。
 
 #### 8.1.1.5. 通用隧道接口
 
@@ -193,7 +193,7 @@ GIF（通用接口，Generic InterFace）是一种用于配置隧道的伪接口
 
 可以使用 [gifconfig(8)](https://man.freebsd.org/cgi/man.cgi?query=gifconfig&sektion=8&format=html) 为 gif 接口分配物理（外层）源地址和目标地址。若内外层 IP 头使用相同地址族（如 v4 封装于 v4，或 v6 封装于 v6），这种配置是危险的。非常容易配置出无限层隧道的接口与路由表。**请务必注意**。
 
-gif 可以配置为支持 ECN（显式拥塞通知）友好行为。关于隧道的 ECN 友好性详见 [23.5.4.5](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#ipsec-ecn)，以及如何配置详见 [gif(4)](https://man.freebsd.org/cgi/man.cgi?query=gif&sektion=4&format=html)。
+gif 可以配置为支持 ECN（显式拥塞通知）友好行为。关于隧道的 ECN 友好性详见 [IPsec 隧道中的 ECN 考虑](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#ipsec-ecn)，以及如何配置详见 [gif(4)](https://man.freebsd.org/cgi/man.cgi?query=gif&sektion=4&format=html)。
 
 如果你希望使用 gif 接口配置 IPv4 封装于 IPv6 的隧道，请仔细阅读 [gif(4)](https://man.freebsd.org/cgi/man.cgi?query=gif&sektion=4&format=html)。你需要手动移除自动分配给 gif 接口的 IPv6 链路本地地址。
 
@@ -208,7 +208,7 @@ gif 可以配置为支持 ECN（显式拥塞通知）友好行为。关于隧道
 4. 如果仍没有符合条件的地址，且目的地址是站点本地（site local）作用域，则选择任一接口上分配的站点本地地址。
 5. 如果仍无法满足条件，则选择与目标地址的路由表项相关联的地址。此为最后手段，可能导致作用域违规。
 
-例如，目的地址为 `ff01::1` 时会选取 `::1` 作为源地址；目的地址为 `fe80:1::2a0:24ff:feab:839b` 时会选取 `fe80:1::200:f8ff:fe01:6317`（注意嵌入的接口索引，详见 [23.5.1.3](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#ipv6-scope-index)，帮助我们选择正确的源地址。这些嵌入索引不会出现在网络数据包中）。若出口接口上存在多个具有相同作用域的地址，将基于最长匹配原则选择（规则 3）。假设出口接口上配置了 `2001:0DB8:808:1:200:f8ff:fe01:6317` 与 `2001:0DB8:9:124:200:f8ff:fe01:6317`，那么对于目的地址 `2001:0DB8:800::1`，将选用 `2001:0DB8:808:1:200:f8ff:fe01:6317` 作为源地址。
+例如，目的地址为 `ff01::1` 时会选取 `::1` 作为源地址；目的地址为 `fe80:1::2a0:24ff:feab:839b` 时会选取 `fe80:1::200:f8ff:fe01:6317`（注意嵌入的接口索引，详见 [作用域索引](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#ipv6-scope-index)，帮助我们选择正确的源地址。这些嵌入索引不会出现在网络数据包中）。若出口接口上存在多个具有相同作用域的地址，将基于最长匹配原则选择（规则 3）。假设出口接口上配置了 `2001:0DB8:808:1:200:f8ff:fe01:6317` 与 `2001:0DB8:9:124:200:f8ff:fe01:6317`，那么对于目的地址 `2001:0DB8:800::1`，将选用 `2001:0DB8:808:1:200:f8ff:fe01:6317` 作为源地址。
 
 需要注意的是，上述规则未在 IPv6 规范中定义，属于“由实现决定”的项目。以下是一些不遵循上述规则的情况：
 例如建立 TCP 连接时，会使用保存在 tcb 中的地址作为源地址；再如发送邻居通告（Neighbor Advertisement）时，规范（RFC2461 第 7.2.2 节）要求 NA 的源地址为对应 NS 的目标地址。在这种情况下我们遵循规范，而非最长匹配规则。
