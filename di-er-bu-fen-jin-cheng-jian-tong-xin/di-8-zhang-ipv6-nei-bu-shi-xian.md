@@ -51,7 +51,7 @@ TAHI 项目在 KAME STABLE 套件上进行了标准符合性测试。测试结�
   * 详情见本文件的 [邻居发现](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#neighbor-discovery) 一节。
 * RFC2462：IPv6 无状态地址自动配置
 
-  * 详情见本文件第 [23.5.1.4](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#ipv6-pnp) 节。
+  * 详情见本文件的 [即插即用](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#ipv6-pnp) 一节。
 * RFC2463：IPv6 的 ICMPv6 规范
 
   * 详情见本文件第 [23.5.1.9](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#icmpv6) 节。
