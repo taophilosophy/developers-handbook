@@ -4,35 +4,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 仓库概览
 
-这是 FreeBSD 官方手册（FreeBSD Handbook）的中文翻译项目。基于 GitBook 格式，发布在 <https://handbook.bsdcn.org>。
+这是 FreeBSD 开发者手册（Developers' Handbook）的中文翻译项目。基于 GitBook 格式发布。
 
 源内容为 Markdown 文件，由 GitBook 平台自动构建和部署，无需本地构建步骤。
 
-**翻译基准：** 以 FreeBSD 最新 RELEASE 版本为准，翻译源为 <https://docs.freebsd.org/en/books/handbook/book/>。
+**翻译基准：** 以 FreeBSD 最新 RELEASE 版本为准，翻译源为 <https://docs.freebsd.org/en/books/developers-handbook/>。
 
 ## 内容架构
 
 ### 核心文件
 
 - **`SUMMARY.md`** — 全书唯一数据源，定义完整目录结构和导航树。GitBook 用它来生成侧边栏。 **第一行 `# Table of contents` 绝对不能变更** ，否则 GitBook 同步失效。
-- **`mu-lu.md`** — 由 `mulu.yml` CI 工作流从 `SUMMARY.md` 自动复制生成，**不要手动编辑** 。
-- **`yi-zhe-shuo-ming.md`** — 术语翻译对照表，所有术语翻译以此为准。
-- **`CHANGELOG.md`** — 编辑日志，记录翻译进度和同步上游的 commit。
 
 ### 目录结构
 
-- 章节目录遵循 `di-X-zhang-<主题>/` 命名模式（拼音 slug）
-- 每节为独立 `.md` 文件，如 `di-1-zhang-jian-jie/1.1.-gai-shu.md`
-- 前言在 `qian-yan/`，附录在 `fu-lu-X/`
-- 分部介绍页如 `di-yi-bu-fen-kuai-su-kai-shi.md`
-- `.gitbook/assets/` — GitBook 静态资源（logo 等）
-- 全书共 35 章（Ch1-Ch35），中文章号与英文原版 1:1 对应；Ch18 为「OCI 容器」，于 2026-06 由英文原版补译
-- 章节结构对比脚本位于 `script/compare_structure_v2.py`，可检测中英文版本子章节级差异
-- `en/` — 英文 AsciiDoc 原版归档（40 个子目录，每个含 `_index.adoc`），用于翻译对照参考；不要修改或翻译其中的内容
+- 章节目录遵循 `di-X-zhang-<主题>/` 命名模式（拼音 slug），每章为单个 `.md` 文件（非每节独立文件）
+- 商标与概述位于 `freebsd-kai-fa-zhe-shou-ce/`
+- 第一部分（基础，Ch1-Ch6）位于 `di-yi-bu-fen-ji-chu/`
+- 第二部分（进程间通信，Ch7-Ch8）位于 `di-er-bu-fen-jin-cheng-jian-tong-xin/`
+- 第三部分（内核，Ch9-Ch10）位于 `di-san-bu-fen-nei-he/`
+- 第四部分（架构，Ch11 x86 汇编语言程序设计，英文原版无此章节）位于 `di-si-bu-fen-jia-gou/`
+- 第五部分（附录，参考文献）位于 `di-wu-bu-fen-fu-lu/`
+- 全书共 11 章 + 参考文献，中文章号与英文原版 1:1 对应
+- `en/` — 英文 AsciiDoc 原版归档（11 个章节子目录 + 根目录，每个含 `_index.adoc`；另含 4 个 part adoc 和 `book.adoc`；含同名 `.po` 文件可忽略），用于翻译对照参考；不要修改或翻译其中的内容
 
 ### 标题管理（关键约束）
 
-`senc-headers.yml` 工作流会在每次 push 时自动将 `SUMMARY.md` 中的标题同步到对应 `.md` 文件的 H1。 **这意味着直接编辑 `.md` 文件的 `# 标题` 会被 CI 覆盖。** 修改章节标题时，只改 `SUMMARY.md` 中对应的 `* [标题](路径)` 条目即可。
+`sync-headers.yml` 工作流会在每次 push 时自动将 `SUMMARY.md` 中的标题同步到对应 `.md` 文件的 H1。 **这意味着直接编辑 `.md` 文件的 `# 标题` 会被 CI 覆盖。** 修改章节标题时，只改 `SUMMARY.md` 中对应的 `* [标题](路径)` 条目即可。
 
 ## CI/CD 工作流
 
@@ -74,7 +72,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - "Jail" 保持英文（不翻译为"监狱"、"监牢"）禁止机械替换。
 - "拷贝" → "复制"，"壳/外壳" → "shell"。禁止机械替换。
 - 第二人称一律使用"你"而非"您"
-- 所有术语翻译见 `yi-zhe-shuo-ming.md` 对照表
 
 ### CJK 空格
 
@@ -93,7 +90,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 对已翻译章节进行质量审校时，参考以下步骤：
 
-1. **获取原文**：通过 `WebFetch` 抓取对应章节的英文原版页面（`https://docs.freebsd.org/en/books/handbook/<chapter-slug>/`），获取完整的英文文本。但是，如果存在 en 文件夹，以 en 文件夹对应目录为基准。
+1. **获取原文**：通过 `WebFetch` 抓取对应章节的英文原版页面（`https://docs.freebsd.org/en/books/developers-handbook/<chapter-slug>/`），获取完整的英文文本。但是，如果存在 en 文件夹，以 en 文件夹对应目录的 `_index.adoc` 为权威源。
 
 2. **逐句对照**：将中文翻译与英文原文逐句比对，重点检查以下问题类别：
 
@@ -116,14 +113,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 4. **注意事项**：
    - 不要修改 `# 标题`——会被 `sync-headers.yml` CI 覆盖
-   - 保持术语一致性，参考 `yi-zhe-shuo-ming.md`
+   - 保持术语一致性，参考「术语」小节约定
    - 英文原文可能比翻译版本更新，版本号差异（如 15.0 vs 16.0）应以英文原版为准
    - 添加新内容（如英文原版新增的段落）时，确保翻译风格与上下文一致
    - 禁止篡改带圈数字，如 ①②③ 等，确保其位置、数量和英语原文一致
    - 禁止篡改代码块（包括 shell 命令、配置文件内容、ini 段等），仅修改正文翻译
    - 禁止篡改用户名、邮箱、URL、IP 地址等技术参数
    - 禁止篡改软件版本号
-   - 以英文原版 `docs.freebsd.org/en/books/handbook/` 为唯一权威源；禁止以中文版已有翻译作为修改依据，避免错误沿袭
+   - 以英文原版 `docs.freebsd.org/en/books/developers-handbook/` 为唯一权威源；禁止以中文版已有翻译作为修改依据，避免错误沿袭
 
 5. **逐句校对递归工作流**（核心约束）：
    - **逐行逐句子**遍历内容，检查逻辑一致性，联网复核后修改
@@ -136,11 +133,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 章节结构管理工作流
 
-当中英文版本章节结构出现差异（如新增章节、删除章节、子节层级错误）时，按本工作流处理。完整执行记录见 `script/章节结构对比最终分析报告.md`。
+当中英文版本章节结构出现差异（如新增章节、删除章节、子节层级错误）时，按本工作流处理。
 
 ### 1. 检测差异
 
-运行 `script/compare_structure_v2.py` 检测中英文版本子章节级差异（H2 节 / H3 子节 / H4 子子节）。脚本自动处理中文 gitbook 标题层级偏移（中文每节为独立 `.md` 文件，标题比英文 adoc 浅一级，需 `shift=+1`）和文件名按节号自然排序。
+人工比对 `en/book.adoc`（及各 part adoc）与 `SUMMARY.md`，检测中英文版本子章节级差异（H2 节 / H3 子节 / H4 子子节）。注意中文 gitbook 标题层级偏移：中文每章为单个 `.md` 文件，标题比英文 adoc 浅一级（adoc 的 `==` 对应中文的 `##`）。
 
 ### 2. 章节编号 1:1 对应原则
 
@@ -150,7 +147,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 1. 在仓库根目录新建 `di-X-zhang-<拼音 slug>/` 目录
 2. 按英文原版 `_index.adoc` 的 H2 节结构创建对应 `.md` 文件（如 `X.1.-gai-shu.md`、`X.2.-xxx.md`）
-3. 翻译时遵循术语对照表 `yi-zhe-shuo-ming.md`，第二人称用"你"，`ports`/`Jail` 保留英文
+3. 翻译时遵循「术语」小节约定，第二人称用"你"，`ports`/`Jail` 保留英文
 4. 每节 `.md` 文件首行 `# X.Y.标题` 由 `sync-headers.yml` CI 从 `SUMMARY.md` 同步，**不要手动编辑 H1**
 5. 在 `SUMMARY.md` 对应位置插入新章节条目（保持 `* [标题](路径)` 格式）
 
@@ -161,13 +158,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 1. 修改 `.md` 文件内的章号（如 `## 18.1.` → `## 19.1.`，仅改 H2/H3/H4 的章号前缀，不动小节号）
 2. 重命名 `.md` 文件名前缀（如 `18.1.-gai-shu.md` → `19.1.-gai-shu.md`）
 3. 重命名目录（如 `di-18-zhang-xxx/` → `di-19-zhang-xxx/`）
-4. 临时脚本与日志放在 `script/` 目录，命名如 `rename_chXX_offset.py`、`rename_log.md`
+4. 临时脚本与日志按需创建在仓库根目录或合适位置，命名如 `rename_chXX_offset.py`、`rename_log.md`
 
 ### 5. 跨章节引用修复
 
 重命名后所有跨章节 markdown 链接路径需同步更新。链接路径模式：`](../di-X-zhang-yyy/X.Z.-file.md)`，使用正则匹配更新目录名和文件名章号前缀。
 
-修复脚本示例：`script/fix_xref_paths.py`，扫描所有 `.md` 文件，仅修改 markdown 链接路径，不动正文内容。修复日志写入 `script/xref_fix_log.md`。
+按需编写临时脚本扫描所有 `.md` 文件，仅修改 markdown 链接路径，不动正文内容。修复日志可记录在 `xref_fix_log.md` 中。
 
 ### 6. 同步 `SUMMARY.md`
 
