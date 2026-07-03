@@ -54,7 +54,7 @@ TAHI 项目在 KAME STABLE 套件上进行了标准符合性测试。测试结�
   * 详情见本文件的 [即插即用](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#ipv6-pnp) 一节。
 * RFC2463：IPv6 的 ICMPv6 规范
 
-  * 详情见本文件第 [23.5.1.9](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#icmpv6) 节。
+  * 详情见本文件的 [ICMPv6](https://docs.freebsd.org/en/books/developers-handbook/ipv6/#icmpv6) 一节。
 * RFC2464：以太网上的 IPv6 分组传输
 * RFC2465：IPv6 的 MIB：文本约定与常规组
 
