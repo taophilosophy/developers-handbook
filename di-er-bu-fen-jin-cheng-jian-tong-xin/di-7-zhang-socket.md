@@ -156,7 +156,7 @@ struct sockaddr {
 
 请注意 `sa_data` 字段的*模糊性*，它仅声明为 `14` 字节的数组，注释提示它可能包含超过 `14` 字节的数据。
 
-这种模糊性是故意的。套接字是一个非常强大的接口。虽然大多数人可能认为它不过是一个 Internet 接口——并且大多数应用程序现在可能就是这样使用它——套接字几乎可以用于任何形式的进程间通信，其中互联网（或更确切地说是 IP）只是其中之一。
+这种模糊性是故意的。套接字是一个非常强大的接口。虽然大多数人可能认为它不过是一个互联网接口——并且大多数应用程序现在可能就是这样使用它——套接字几乎可以用于任何形式的进程间通信，其中互联网（或更确切地说是 IP）只是其中之一。
 
 **sys/socket.h** 将套接字所处理的各种协议称为*地址族*，并在 `sockaddr` 定义之前列出它们：
 
@@ -598,7 +598,7 @@ if (INADDR_ANY)
 
 ![serv](https://docs.freebsd.org/images/books/developers-handbook/serv.png)
 
-**图 10. 顺序服务器（Sequential Server）**
+**图 10. 顺序服务器**
 
 这个流程图适用于 *顺序服务器*，即一次只能服务一个客户端的服务器，就像我们的 *daytime* 服务器一样。只有在客户端和服务器之间没有真正的“对话”时，这种方式才是可行的：一旦服务器检测到客户端连接，它便立即发送一些数据，然后关闭连接。整个过程可能只需几纳秒便完成。
 
@@ -693,7 +693,7 @@ FreeBSD 的 C 标准库包含许多用于套接字编程的辅助函数。例如
 
 ### 7.6.1. `gethostbyname`
 
-虽然没有办法将域名直接传递给任何套接字函数，但 FreeBSD 的 C 库提供了 [gethostbyname(3)](https://man.freebsd.org/cgi/man.cgi?query=gethostbyname&sektion=3&format=html) 和 [gethostbyname2(3)](https://man.freebsd.org/cgi/man.cgi?query=gethostbyname2&sektion=3&format=html) 这两个函数，它们在 **netdb.h** 中声明。
+虽然没有办法将域名直接传递给任何套接字函数，但 FreeBSD 的 C 标准库提供了 [gethostbyname(3)](https://man.freebsd.org/cgi/man.cgi?query=gethostbyname&sektion=3&format=html) 和 [gethostbyname2(3)](https://man.freebsd.org/cgi/man.cgi?query=gethostbyname2&sektion=3&format=html) 这两个函数，它们在 **netdb.h** 中声明。
 
 ```c
 struct hostent * gethostbyname(const char *name);
