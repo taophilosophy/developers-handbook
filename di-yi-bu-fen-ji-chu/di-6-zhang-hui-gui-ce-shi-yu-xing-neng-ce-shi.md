@@ -16,7 +16,7 @@ FreeBSD 的回归测试工具可以在 FreeBSD 源码树中的 **src/tools/regre
 * 如果会产生 [syslog(3)](https://man.freebsd.org/cgi/man.cgi?query=syslog&sektion=3&format=html) 事件，可以让 [syslogd(8)](https://man.freebsd.org/cgi/man.cgi?query=syslogd&sektion=8&format=html) 读取一个空的 **/etc/syslogd.conf**，否则就不要运行它。
 * 最小化磁盘 I/O，若可行则完全避免。
 * 不要挂载不需要的文件系统。
-* 如果可能，将 **/**、**/usr** 以及其他文件系统挂载为只读。这可以避免因访问时间（atime）更新而引起的磁盘 I/O 干扰。
+* 如果可能，将 **/**、**/usr** 以及其他文件系统挂载为只读。这可以避免因访问时间（atime）更新等引起的磁盘 I/O 干扰。
 * 每次运行前用 [newfs(8)](https://man.freebsd.org/cgi/man.cgi?query=newfs&sektion=8&format=html) 重新初始化读写测试使用的文件系统，并用 [tar(1)](https://man.freebsd.org/cgi/man.cgi?query=tar&sektion=1&format=html) 或 [dump(8)](https://man.freebsd.org/cgi/man.cgi?query=dump&sektion=8&format=html) 文件进行填充。在测试开始前卸载并重新挂载，这样可以获得一致的文件系统布局。对于 worldstone 测试，这适用于 **/usr/obj**（只需用 `newfs` 重新初始化并挂载即可）。若想实现 100% 可重现性，可使用 [dd(1)](https://man.freebsd.org/cgi/man.cgi?query=dd&sektion=1&format=html) 命令从映像填充文件系统（例如：`dd if=myimage of=/dev/ad0s1h bs=1m`）。
 * 使用由 malloc 支持或预加载的 [md(4)](https://man.freebsd.org/cgi/man.cgi?query=md&sektion=4&format=html) 分区。
 * 在每次测试迭代之间重启系统，以保证状态一致。
@@ -35,8 +35,7 @@ FreeBSD 的回归测试工具可以在 FreeBSD 源码树中的 **src/tools/regre
 推荐模式为：`bababa{bbbaaa}*`。
 这样，前 1+1 次就能初步判断趋势（若完全跑偏可及时终止测试），3+3 次可以估算标准差（决定是否值得长时间运行），后续数据可用于趋势和交互分析。
 * 使用 [ministat(1)](https://man.freebsd.org/cgi/man.cgi?query=ministat&sektion=1&format=html) 判断数值是否有统计意义。如果你忘记或从未学过标准差和 Student's T 分布，强烈推荐《Cartoon guide to statistics》，ISBN: 0062731025。
-* 不要使用后台 [fsck(8)](https://man.freebsd.org/cgi/man.cgi?query=fsck&sektion=8&format=html)，除非正在基准测试该功能。同时，在 **/etc/rc.conf** 中禁用 `background_fsck`，除非基准测试是在启动后至少延迟了 60 秒加 `fsck` 运行时间之后进行的，因为启用后台 `fsck` 时，[rc(8)](https://man.freebsd.org/cgi/man.cgi?query=rc&sektion=8&format=html) 会唤醒并检查是否需要对任何文件系统运行 `fsck`。
-同样，除非是测试快照功能，否则确保没有残留快照存在。
+* 不要使用后台 [fsck(8)](https://man.freebsd.org/cgi/man.cgi?query=fsck&sektion=8&format=html)，除非正在基准测试该功能。同时，在 **/etc/rc.conf** 中禁用 `background_fsck`，除非基准测试是在启动后至少延迟了 60 秒加 `fsck` 运行时间之后进行的，因为启用后台 `fsck` 时，[rc(8)](https://man.freebsd.org/cgi/man.cgi?query=rc&sektion=8&format=html) 会唤醒并检查是否需要对任何文件系统运行 `fsck`。同样，除非是测试快照功能，否则确保没有残留快照存在。
 * 如果基准测试表现异常差，检查是否有异常的中断源导致的中断量暴增。有报告指出部分 ACPI 版本存在“异常行为”，会产生过多中断。为诊断异常测试结果，可以用 `vmstat -i` 拍几张快照，看看有没有异常。
 * 注意内核和用户空间的优化参数，以及调试选项。很容易不小心遗漏某项，最后发现测试内容不一致。
 * 除非专门测试这些功能，不要在启用了 `WITNESS` 和 `INVARIANTS` 的内核下进行基准测试。`WITNESS` 可能导致性能下降 400% 以上。类似地，-CURRENT 中用户空间的 [malloc(3)](https://man.freebsd.org/cgi/man.cgi?query=malloc&sektion=3&format=html) 参数默认与生产版不同。

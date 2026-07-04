@@ -15,22 +15,22 @@
 
 1. 运行 [config(8)](https://man.freebsd.org/cgi/man.cgi?query=config&sektion=8&format=html) 来生成内核源代码：
 
-   ```
+   ```sh
    # /usr/sbin/config MYKERNEL
    ```
 2. 进入构建目录。如上所述运行 [config(8)](https://man.freebsd.org/cgi/man.cgi?query=config&sektion=8&format=html) 后，会打印出此目录的名称。
 
-   ```
+   ```sh
    # cd ../compile/MYKERNEL
    ```
 3. 编译内核：
 
-   ```
+   ```sh
    # make depend
    # make
    ```
 4. 安装新内核：
 
-   ```
+   ```sh
    # make install
    ```

@@ -20,7 +20,7 @@
 
 ### 10.1.1. 配置转储设备
 
-在内核将其物理内存内容转储到转储设备之前，必须先配置转储设备。可以使用 [dumpon(8)](https://man.freebsd.org/cgi/man.cgi?query=dumpon&sektion=8&format=html) 命令告诉内核将内核崩溃转储保存到哪里。必须在使用 [swapon(8)](https://man.freebsd.org/cgi/man.cgi?query=swapon&sektion=8&format=html) 配置交换分区后调用 [dumpon(8)](https://man.freebsd.org/cgi/man.cgi?query=dumpon&sektion=8&format=html) 程序。这通常通过在 [rc.conf(5)](https://man.freebsd.org/cgi/man.cgi?query=rc.conf&sektion=5&format=html) 中设置 `dumpdev` 变量来处理，`dumpdev` 变量指定交换设备的路径（这是提取内核转储的推荐方式），或者设置为 `AUTO`，以使用第一个配置的交换设备。`dumpdev` 的默认值在 HEAD 中为 `AUTO`，在 `RELENG_*` 分支中更改为 `NO`（除了 `RELENG_7`，仍然设置为 `AUTO`）。在 FreeBSD 9.0-RELEASE 及更高版本中，bsdinstall 会在安装过程中询问是否启用目标系统的崩溃转储。
+在内核将其物理内存内容转储到转储设备之前，必须先配置转储设备。可以使用 [dumpon(8)](https://man.freebsd.org/cgi/man.cgi?query=dumpon&sektion=8&format=html) 命令告诉内核将内核崩溃转储保存到哪里。必须在使用 [swapon(8)](https://man.freebsd.org/cgi/man.cgi?query=swapon&sektion=8&format=html) 配置交换分区后调用 [dumpon(8)](https://man.freebsd.org/cgi/man.cgi?query=dumpon&sektion=8&format=html) 程序。这通常通过在 [rc.conf(5)](https://man.freebsd.org/cgi/man.cgi?query=rc.conf&sektion=5&format=html) 中设置 `dumpdev` 变量来处理，`dumpdev` 变量指定交换设备的路径（这是提取内核转储的推荐方式），或者设置为 `AUTO`，以使用第一个配置的交换设备。`dumpdev` 的默认值在 HEAD 中为 `AUTO`，在 `RELENG_*` 分支中更改为 `NO`（除了 `RELENG_7`，仍然设置为 `AUTO`）。在 FreeBSD 9.0-RELEASE 及更高版本中，`bsdinstall` 会在安装过程中询问是否启用目标系统的崩溃转储。
 
 >**技巧**
 >
@@ -71,7 +71,7 @@
 Enter full pathname of shell or RETURN for /bin/sh:
 # mount -a -u -r
 # sysctl debug.kdb.panic=1
-debug.kdb.panic: panic: kdb_sysctl_panic
+debug.kdb.panic:panic: kdb_sysctl_panic
 ...
 ```
 
@@ -83,7 +83,7 @@ debug.kdb.panic: panic: kdb_sysctl_panic
 >
 >本节介绍 [kgdb(1)](https://man.freebsd.org/cgi/man.cgi?query=kgdb&sektion=1&format=html)。最新版本包含在 [devel/gdb](https://cgit.freebsd.org/ports/tree/devel/gdb/) 中。
 
-要进入调试器并开始从转储中获取信息，启动 kgdb：
+要进入调试器并开始从转储中获取信息，启动 `kgdb`：
 
 ```sh
 # kgdb -n N
@@ -95,7 +95,7 @@ debug.kdb.panic: panic: kdb_sysctl_panic
 # kgdb -n last
 ```
 
-通常，[kgdb(1)](https://man.freebsd.org/cgi/man.cgi?query=kgdb&sektion=1&format=html) 应该能够找到生成转储时运行的内核。如果无法找到正确的内核，可以将内核和转储的路径作为两个参数传递给 kgdb：
+通常，[kgdb(1)](https://man.freebsd.org/cgi/man.cgi?query=kgdb&sektion=1&format=html) 应该能够找到生成转储时运行的内核。如果无法找到正确的内核，可以将内核和转储的路径作为两个参数传递给 `kgdb`：
 
 ```sh
 # kgdb /boot/kernel/kernel /var/crash/vmcore.0
@@ -456,7 +456,7 @@ kdb_enter (why=<optimized out>, msg=<optimized out>) at /usr/src/sys/kern/subr_k
 
 >**技巧**
 >
->根据所使用的编译器，一些局部变量可能会显示为 `<optimized out>`，从而无法被 `gdb` 直接检查。如果在调试过程中出现此问题，可以通过以较低的优化级别构建内核来改善某些变量的可见性。这可以通过将 `COPTFLAGS=-O1` 传递给 [make(1)](https://man.freebsd.org/cgi/man.cgi?query=make&sektion=1&format=html) 来完成。然而，某些类型的内核错误在更改优化级别时可能会表现不同（或根本不再出现）。 
+>根据所使用的编译器，一些局部变量可能会显示为 `<optimized out>`，从而无法被 `gdb` 直接检查。如果在调试过程中出现此问题，可以通过以较低的优化级别构建内核来改善某些变量的可见性。这可以通过将 `COPTFLAGS=-O1` 传递给 [make(1)](https://man.freebsd.org/cgi/man.cgi?query=make&sektion=1&format=html) 来完成。然而，某些类型的内核错误在更改优化级别时可能会表现不同（或根本不再出现）。
 
 你可以像使用任何其他 GDB 会话一样使用此会话，包括完全访问源代码，在 Emacs 窗口中以 gud-mode 运行它（这会在另一个 Emacs 窗口中自动显示源代码）等。
 
@@ -555,11 +555,11 @@ hw.firewire.dcons_crom.force_console=1
 
 以下是运行 [dconschat(8)](https://man.freebsd.org/cgi/man.cgi?query=dconschat&sektion=8&format=html) 后可以使用的键盘组合：
 
-| ~+. | 断开连接         |
-| -------- | ------------ |
-| ~       | ALT BREAK    |
-| ~       | 重置目标         |
-| ~       | 暂停 dconschat |
+| ~+. | 断开连接 |
+| :--: | :------: |
+| ~ | ALT BREAK |
+| ~ | 重置目标 |
+| ~ | 暂停 dconschat |
 
 通过启动 [kgdb(1)](https://man.freebsd.org/cgi/man.cgi?query=kgdb&sektion=1&format=html) 并进行远程调试会话来附加远程 GDB：
 

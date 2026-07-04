@@ -477,7 +477,7 @@ IPsec 模块作为标准 IPv4/IPv6 处理的“钩子”实现。当发送数据
 隧道模式在本版本中部分支持，具有以下限制：
 
 * IPsec 隧道不能与 GIF 通用隧道接口结合使用。需要特别小心，因为我们可能会在 `ip_output()` 和 `tunnelifp->if_output()` 之间创建一个无限循环。关于是否统一它们，意见不一。
-* MTU 和不分段位（IPv4）需要更多的检查，但基本上可以正常工作。
+* MTU 和不分片位（IPv4）需要更多的检查，但基本上可以正常工作。
 * AH 隧道的身份验证模型需要重新审视。最终，我们需要改进策略管理引擎。
 
 #### 8.1.4.4. 遵循 RFC 和 ID 的一致性
@@ -578,6 +578,6 @@ ECN allowed     将除了 ECN CE 外的所有 TOS 位复制   使用内层 TOS �
 
 #### 8.1.4.6. 互操作性
 
-以下是 KAME 代码过去在多个平台上测试 IPsec/IKE 互操作性的情况。请注意，双方可能已修改过其实现，因此请仅将以下列表作为参考。
+以下是 KAME 代码过去测试过 IPsec/IKE 互操作性的部分平台。请注意，双方可能已修改过其实现，因此请仅将以下列表作为参考。
 
 Altiga、Ashley-laurent（vpcom.com）、Data Fellows（F-Secure）、Ericsson ACC、FreeS/WAN、HITACHI、IBM AIX®、IIJ、Intel、Microsoft® Windows NT®、NIST（Linux IPsec + plutoplus）、Netscreen、OpenBSD、RedCreek、Routerware、SSH、Secure Computing、Soliton、Toshiba、VPNet、Yamaha RT100i

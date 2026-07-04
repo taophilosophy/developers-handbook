@@ -42,7 +42,7 @@ $set 1
 
 ### 4.2.2. 在源代码中使用目录文件
 
-使用这些目录文件很简单。为了使用相关函数，必须包含头文件 **nl_types.h**。在使用目录前，需使用 [catopen(3)](https://man.freebsd.org/cgi/man.cgi?query=catopen&sektion=3&format=html) 打开目录文件。该函数接受两个参数，第一个是安装并编译后的目录文件名，通常使用程序名（如 grep），此名将用于查找编译目录文件。[catopen(3)](https://man.freebsd.org/cgi/man.cgi?query=catopen&sektion=3&format=html) 会在 **/usr/share/nls/locale/catname** 和 **/usr/local/share/nls/locale/catname** 中查找此文件，其中 `locale` 是设置的语言环境，`catname` 是目录名。
+使用这些目录文件很简单。为了使用相关函数，必须包含头文件 **nl_types.h**。在使用目录前，需使用 [catopen(3)](https://man.freebsd.org/cgi/man.cgi?query=catopen&sektion=3&format=html) 打开目录文件。该函数接受两个参数，第一个是安装并编译后的目录文件名，通常使用程序名（如 `grep`），此名将用于查找编译目录文件。[catopen(3)](https://man.freebsd.org/cgi/man.cgi?query=catopen&sektion=3&format=html) 会在 **/usr/share/nls/locale/catname** 和 **/usr/local/share/nls/locale/catname** 中查找此文件，其中 `locale` 是设置的语言环境，`catname` 是目录名。
 
 第二个参数是一个常量，有两个取值：
 
