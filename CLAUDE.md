@@ -8,7 +8,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 源内容为 Markdown 文件，由 GitBook 平台自动构建和部署，无需本地构建步骤。
 
-**翻译基准：** 以 FreeBSD 最新 RELEASE 版本为准，翻译源为 <https://docs.freebsd.org/en/books/developers-handbook/>。
+
+## 翻译版本
+
+流程：拉取 git 项目（注意，因为部分文件存在英文冒号，在 Windows 下无法拉取，需要下载 zip 压缩包）：https://github.com/freebsd/freebsd-doc
+
+当前翻译 git 版本：93d98e91f6bfaacd7fae40dd398efe47d44f085b
+
+路径：**documentation/content/en/books/**
+
+将 **documentation/content/en/books** 文件夹内的内容完全复制到 en 路径下（自行分析结构），然后进行比较翻译。
+
+最后更新本文中的相关信息（如翻译 git 版本）。
+
+需要进一步核查时，才参考 <https://docs.freebsd.org/en/books/handbook/book/>。
+
+不存在 en 文件夹时，以 FreeBSD 最新 RELEASE 版本为准，翻译源为 <https://docs.freebsd.org/en/books/developers-handbook/>。
+
 
 ## 内容架构
 
