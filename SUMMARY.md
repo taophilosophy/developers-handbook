@@ -1,6 +1,6 @@
 # Table of contents
 
-* [developers-handbook](README.md)
+* [FreeBSD 开发者手册](README.md)
 
 ***
 
@@ -20,7 +20,7 @@
 * [第 5 章. 源代码树准则与规范](di-yi-bu-fen-ji-chu/di-5-zhang-.-yuan-dai-ma-shu-zhun-ze-yu-gui-fan.md)
 * [第 6 章 回归测试与性能测试](di-yi-bu-fen-ji-chu/di-6-zhang-hui-gui-ce-shi-yu-xing-neng-ce-shi.md)
 
-## 第二部分：进程间通信&#x20;
+## 第二部分：进程间通信
 
 * [第 7 章 套接字](di-er-bu-fen-jin-cheng-jian-tong-xin/di-7-zhang-socket.md)
 * [第 8 章 IPv6 内部实现](di-er-bu-fen-jin-cheng-jian-tong-xin/di-8-zhang-ipv6-nei-bu-shi-xian.md)
