@@ -26,7 +26,6 @@
 >
 > 检查 **/etc/fstab** 或 [swapinfo(8)](https://man.freebsd.org/cgi/man.cgi?query=swapinfo&sektion=8&format=html)，以查看交换设备的列表。
 
-
 >**重要**
 >
 >在内核崩溃之前，确保在 [rc.conf(5)](https://man.freebsd.org/cgi/man.cgi?query=rc.conf&sektion=5&format=html) 中指定的 `dumpdir` 已存在！
@@ -38,7 +37,6 @@
 >
 >另外，请记住，**/var/crash** 目录的内容是敏感的，极有可能包含诸如密码等机密信息。
 
-
 ### 10.1.2. 提取内核转储
 
 若内核转储已写入转储设备，必须在挂载交换设备之前提取该转储。要从转储设备提取转储，请使用 [savecore(8)](https://man.freebsd.org/cgi/man.cgi?query=savecore&sektion=8&format=html) 程序。如果在 [rc.conf(5)](https://man.freebsd.org/cgi/man.cgi?query=rc.conf&sektion=5&format=html) 中设置了 `dumpdev`，则在崩溃后的第一次多用户启动时、交换设备挂载之前，[savecore(8)](https://man.freebsd.org/cgi/man.cgi?query=savecore&sektion=8&format=html) 将自动调用。提取的核心文件位置由 [rc.conf(5)](https://man.freebsd.org/cgi/man.cgi?query=rc.conf&sektion=5&format=html) 中的 `dumpdir` 值指定，默认位置是 **/var/crash**，并且文件名为 **vmcore.0**。
@@ -46,7 +44,6 @@
 如果 **/var/crash** 中已存在一个名为 **vmcore.0** 的文件（或 `dumpdir` 设置的任何其他目录中），内核将在每次崩溃后递增尾部的数字，以避免覆盖现有的 **vmcore** 文件（例如：**vmcore.1**）。在转储保存之后，[savecore(8)](https://man.freebsd.org/cgi/man.cgi?query=savecore&sektion=8&format=html) 将始终在 **/var/crash** 中创建一个名为 **vmcore.last** 的符号链接。此符号链接可用于查找最新转储的文件名。
 
 [crashinfo(8)](https://man.freebsd.org/cgi/man.cgi?query=crashinfo&sektion=8&format=html) 工具生成一个包含完整内存转储或小型转储摘要的文本文件。如果在 [rc.conf(5)](https://man.freebsd.org/cgi/man.cgi?query=rc.conf&sektion=5&format=html) 中设置了 `dumpdev`，则在 [savecore(8)](https://man.freebsd.org/cgi/man.cgi?query=savecore&sektion=8&format=html) 执行后，[crashinfo(8)](https://man.freebsd.org/cgi/man.cgi?query=crashinfo&sektion=8&format=html) 将自动调用。输出将保存到 `dumpdir` 中，文件名为 **core.txt.N**。
-
 
 >**技巧**
 >
@@ -201,7 +198,6 @@ debug.kdb.panic:panic: kdb_sysctl_panic
 >**技巧**
 >
 >如果你的系统经常崩溃并且磁盘空间不足，删除 **/var/crash** 中的旧 **vmcore** 文件可以节省相当多的磁盘空间！
-
 
 ## 10.3. 使用 DDB 进行在线内核调试
 
@@ -556,7 +552,7 @@ hw.firewire.dcons_crom.force_console=1
 以下是运行 [dconschat(8)](https://man.freebsd.org/cgi/man.cgi?query=dconschat&sektion=8&format=html) 后可以使用的键盘组合：
 
 | ~+. | 断开连接 |
-| :--: | :------: |
+| :-: | :------: |
 | ~ | ALT BREAK |
 | ~ | 重置目标 |
 | ~ | 暂停 dconschat |
@@ -644,4 +640,3 @@ LANG=C ddd --debugger kgdb kernel /dev/fwmem0.2
 * `options DIAGNOSTIC`：启用附加的、较为昂贵的诊断测试，类似于 `options INVARIANTS`。
 * `options KASAN`：启用内核地址消毒器（Kernel Address Sanitizer）。这启用编译器插桩，用于检测内核中的无效内存访问，如释放后使用和缓冲区溢出。此选项在很大程度上取代了 `options DEBUG_MEMGUARD`。有关详细信息，请参见 [kasan(9)](https://man.freebsd.org/cgi/man.cgi?query=kasan&sektion=9&format=html)，以及当前支持的平台。
 * `options KMSAN`：启用内核内存消毒器（Kernel Memory Sanitizer）。这启用编译器插桩，用于检测未初始化内存的使用。有关详细信息，请参见 [kmsan(9)](https://man.freebsd.org/cgi/man.cgi?query=kmsan&sektion=9&format=html)，以及当前支持的平台。
-
