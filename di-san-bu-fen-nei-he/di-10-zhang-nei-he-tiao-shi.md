@@ -20,7 +20,7 @@
 
 ### 10.1.1. 配置转储设备
 
-在内核将其物理内存内容转储到转储设备之前，必须先配置转储设备。可以使用 [dumpon(8)](https://man.freebsd.org/cgi/man.cgi?query=dumpon&sektion=8&format=html) 命令告诉内核将内核崩溃转储保存到哪里。必须在使用 [swapon(8)](https://man.freebsd.org/cgi/man.cgi?query=swapon&sektion=8&format=html) 配置交换分区后调用 [dumpon(8)](https://man.freebsd.org/cgi/man.cgi?query=dumpon&sektion=8&format=html) 程序。这通常通过在 [rc.conf(5)](https://man.freebsd.org/cgi/man.cgi?query=rc.conf&sektion=5&format=html) 中设置 `dumpdev` 变量来处理，`dumpdev` 变量指定交换设备的路径（这是提取内核转储的推荐方式），或者设置为 `AUTO`，以使用第一个配置的交换设备。`dumpdev` 的默认值在 HEAD 中为 `AUTO`，在 `RELENG_*` 分支中更改为 `NO`（除了 `RELENG_7`，仍然设置为 `AUTO`）。在 FreeBSD 9.0-RELEASE 及更高版本中，`bsdinstall` 会在安装过程中询问是否启用目标系统的崩溃转储。
+在内核将其物理内存内容转储到转储设备之前，必须先配置转储设备。可以使用 [dumpon(8)](https://man.freebsd.org/cgi/man.cgi?query=dumpon&sektion=8&format=html) 命令告诉内核将内核崩溃转储保存到哪里。必须在使用 [swapon(8)](https://man.freebsd.org/cgi/man.cgi?query=swapon&sektion=8&format=html) 配置交换分区后调用 [dumpon(8)](https://man.freebsd.org/cgi/man.cgi?query=dumpon&sektion=8&format=html) 程序。这通常通过在 [rc.conf(5)](https://man.freebsd.org/cgi/man.cgi?query=rc.conf&sektion=5&format=html) 中设置 `dumpdev` 变量来处理，`dumpdev` 变量指定交换设备的路径（这是提取内核转储的推荐方式），或者设置为 `AUTO`，以使用第一个配置的交换设备。`dumpdev` 的默认值在 `HEAD` 中为 `AUTO`，在 `RELENG_*` 分支中更改为 `NO`（除了 `RELENG_7`，仍然设置为 `AUTO`）。在 FreeBSD 9.0-RELEASE 及更高版本中，`bsdinstall` 会在安装过程中询问是否启用目标系统的崩溃转储。
 
 >**技巧**
 >
@@ -400,9 +400,9 @@ options         KDB
 options         GDB
 ```
 
-请注意，`GDB` 选项在 -STABLE 和 -RELEASE 分支的 `GENERIC` 内核中默认关闭，但在 -CURRENT 中启用。
+请注意，`GDB` 选项在 `-STABLE` 和 `-RELEASE` 分支的 `GENERIC` 内核中默认关闭，但在 `-CURRENT` 中启用。
 
-构建完成后，将内核复制到目标机器并启动它。将目标机器的串行线（其 uart 设备上设置了 "flags 080"）连接到调试主机的任何串行端口。有关如何在 uart 设备上设置标志的信息，请参见 [uart(4)](https://man.freebsd.org/cgi/man.cgi?query=uart&sektion=4&format=html)。
+构建完成后，将内核复制到目标机器并启动它。将目标机器的串行线（其 uart 设备上设置了 `flags 080`）连接到调试主机的任何串行端口。有关如何在 uart 设备上设置标志的信息，请参见 [uart(4)](https://man.freebsd.org/cgi/man.cgi?query=uart&sektion=4&format=html)。
 
 目标机器必须进入 GDB 后端，可以是由于 panic 或者通过故意触发进入调试器。在执行此操作之前，选择 GDB 调试后端：
 

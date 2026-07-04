@@ -463,7 +463,7 @@ FreeBSD 提供的标准调试器是 `lldb`（LLVM 调试器）。由于它是该
 >
 > 也可以通过 [Ports 或 Packages](https://docs.freebsd.org/en/books/handbook/ports/#ports-using) 从 [devel/llvm](https://cgit.freebsd.org/ports/tree/devel/llvm/) 获取 `lldb` 命令。
 
-FreeBSD 还提供了另一个调试器 `gdb`（GNU 调试器）。与 lldb 不同，`gdb` 并不是 FreeBSD 的默认安装，若要使用它，请从 Ports 或 Packages 中安装 [devel/gdb](https://cgit.freebsd.org/ports/tree/devel/gdb/)。它提供了很好的在线帮助和一套 info 页面。
+FreeBSD 还提供了另一个调试器 `gdb`（GNU 调试器）。与 `lldb` 不同，`gdb` 并不是 FreeBSD 的默认安装，若要使用它，请从 Ports 或 Packages 中安装 [devel/gdb](https://cgit.freebsd.org/ports/tree/devel/gdb/)。它提供了很好的在线帮助和一套 info 页面。
 
 这两个调试器具有相似的功能集，因此选择使用哪个调试器很大程度上取决于个人喜好。如果只熟悉其中一个，可以使用该调试器。如果对两者都不熟悉，或者都熟悉但希望在 Emacs 中使用其中一个，应该选择 `gdb`，因为 Emacs 不支持 `lldb`。否则，尝试两者并看看哪个更适合自己。
 
@@ -471,7 +471,7 @@ FreeBSD 还提供了另一个调试器 `gdb`（GNU 调试器）。与 lldb 不�
 
 #### 2.6.2.1. 启动 lldb
 
-通过输入以下命令启动 lldb：
+通过输入以下命令启动 `lldb`：
 
 ```sh
 % lldb -- progname
@@ -671,7 +671,7 @@ else if (pid == 0) {		/* 子进程 */
 
 >**注意**
 >
-> 所述功能自 LLDB 版本 12.0.0 起可用。使用早期 LLDB 版本的 FreeBSD release 的用户可能希望使用 [Ports 或 packages](https://docs.freebsd.org/en/books/handbook/#ports-using) 中提供的快照，如 [devel/llvm-devel](https://cgit.freebsd.org/ports/tree/devel/llvm-devel/)。
+> 所述功能自 LLDB 版本 12.0.0 起可用。使用早期 LLDB 版本的 FreeBSD release 的用户可能希望使用 [Ports 或 Packages](https://docs.freebsd.org/en/books/handbook/#ports-using) 中提供的快照，如 [devel/llvm-devel](https://cgit.freebsd.org/ports/tree/devel/llvm-devel/)。
 
 从 LLDB 12.0.0 开始，FreeBSD 支持远程调试。这意味着可以在一台主机上启动 `lldb-server` 来调试程序，而交互式的 `lldb` 客户端则可以从另一台主机连接到它。
 
@@ -699,7 +699,7 @@ else if (pid == 0) {		/* 子进程 */
 
 #### 2.6.4.1. 启动 gdb
 
-通过输入以下命令启动 gdb：
+通过输入以下命令启动 `gdb`：
 
 ```sh
 % gdb progname
@@ -715,7 +715,7 @@ M-x gdb RET progname RET
 
 #### 2.6.4.2. 使用 gdb 运行程序
 
-使用 `-g` 选项编译程序，以便最大限度地发挥 gdb 的功能。即使不加 `-g` 选项，gdb 也能工作，但它只会显示当前运行的函数名称，而不是源代码。如果在启动 gdb 时看到类似以下内容：
+使用 `-g` 选项编译程序，以便最大限度地发挥 `gdb` 的功能。即使不加 `-g` 选项，`gdb` 也能工作，但它只会显示当前运行的函数名称，而不是源代码。如果在启动 `gdb` 时看到类似以下内容：
 
 ```sh
 ... (no debugging symbols found) ...
@@ -723,11 +723,11 @@ M-x gdb RET progname RET
 
 这意味着程序没有使用 `-g` 编译。
 
-在 gdb 提示符下，输入 `break main`。这将告诉调试器跳过程序中的初步设置代码，并在程序代码开始时停止执行。接着输入 `run` 启动程序，程序会从设置代码开始执行，并在调用 `main()` 时被调试器停止。
+在 `gdb` 提示符下，输入 `break main`。这将告诉调试器跳过程序中的初步设置代码，并在程序代码开始时停止执行。接着输入 `run` 启动程序，程序会从设置代码开始执行，并在调用 `main()` 时被调试器停止。
 
 要逐行调试程序，可以按 `n`。当遇到函数调用时，按 `s` 步入该函数。进入函数后，按 `f` 返回，或者使用 `up` 和 `down` 快速查看调用者。
 
-以下是使用 gdb 找到程序错误的一个简单示例。我们有如下程序（包含一个故意的错误）：
+以下是使用 `gdb` 找到程序错误的一个简单示例。我们有如下程序（包含一个故意的错误）：
 
 ```c
 #include <stdio.h>
