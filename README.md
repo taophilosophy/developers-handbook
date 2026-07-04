@@ -6,4 +6,4 @@
 
 FreeBSD Developers' Handbook，项目原文：<https://docs.freebsd.org/en/books/developers-handbook/>
 
-FreeBSD 中文社区（CFC）译制。本项目采用 2 条款 BSD 许可。
+FreeBSD 中文社区（CFC）译制。本翻译项目遵循 [BSD 2-Clause 许可证](LICENSE)。
