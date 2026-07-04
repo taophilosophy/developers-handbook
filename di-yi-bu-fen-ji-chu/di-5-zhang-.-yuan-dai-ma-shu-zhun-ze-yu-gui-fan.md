@@ -52,7 +52,7 @@ FreeBSD 发行版的一部分是由 FreeBSD 项目之外的团队积极维护的
 4. 添加任何受限文件必须获得 [核心团队](https://www.freebsd.org/administration/#t-core) 的特别批准。
 5. 受限文件应放在 **src/contrib** 或 **src/sys/contrib**。
 6. 整个模块应保持完整。除非与非受限代码有代码共享，否则无需拆分。
-7. 过去二进制文件通常是 uuencode 编码的，并命名为 **arch/filename.o.uu**。这已不再必要，现在可以直接将二进制文件原样加入仓库。
+7. 过去二进制文件通常是 uuencode 编码的，并命名为 **arch/filename.o.uu**。这不再必要，现在可以直接将二进制文件原样加入仓库。
 8. 内核文件：
 
    1. 应始终在 **conf/files.\*** 中列出（为简化构建）。

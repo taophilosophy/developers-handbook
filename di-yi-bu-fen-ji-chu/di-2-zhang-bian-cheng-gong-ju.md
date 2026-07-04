@@ -76,7 +76,7 @@ Tcl 是一种可嵌入的解释型语言，因其良好的跨平台特性而得�
 
 显然，这种方式不像使用解释器那样直接。然而，它允许你做很多用解释器很难甚至不可能完成的事情，比如编写与操作系统密切交互的代码——甚至编写你自己的操作系统！如果你需要编写高效的代码，它也非常有用，因为编译器可以花时间优化代码，而这对解释器来说是不可接受的。此外，为编译器编写的程序通常比为解释器编写的程序更易于分发——你只需要给他们一个可执行文件副本，前提是他们使用的操作系统与你相同。
 
-由于使用单独程序进行编辑-编译-运行-调试的周期相当繁琐，许多商业编译器制造商已经开发了集成开发环境（简称 IDE）。FreeBSD 的基础系统中不包括 IDE，但 [devel/kdevelop](https://cgit.freebsd.org/ports/tree/devel/kdevelop/) 在 Ports Collection 中可以找到，许多人也使用 Emacs 来实现这个目的。关于如何使用 Emacs 作为 IDE，请参见 [Using Emacs as a Development Environment](https://docs.freebsd.org/en/books/developers-handbook/tools/#emacs)。
+由于使用单独程序进行编辑-编译-运行-调试的周期相当繁琐，许多商业编译器制造商开发了集成开发环境（简称 IDE）。FreeBSD 的基础系统中不包括 IDE，但 [devel/kdevelop](https://cgit.freebsd.org/ports/tree/devel/kdevelop/) 在 Ports Collection 中可以找到，许多人也使用 Emacs 来实现这个目的。关于如何使用 Emacs 作为 IDE，请参见 [Using Emacs as a Development Environment](https://docs.freebsd.org/en/books/developers-handbook/tools/#emacs)。
 
 ## 2.4. 使用 `cc` 编译
 
@@ -204,7 +204,7 @@ Tcl 是一种可嵌入的解释型语言，因其良好的跨平台特性而得�
 
 ### 2.4.2. 我叫我的可执行文件为 test，但运行时什么也没发生。怎么回事？
 
-大多数 UNIX® 系统都有一个名为 `test` 的程序，它位于 **/usr/bin** 目录，Shell 在检查当前目录之前会先找到它。你可以输入：
+大多数 UNIX® 系统都有一个名为 `test` 的程序，它位于 **/usr/bin** 目录，shell 在检查当前目录之前会先找到它。你可以输入：
 
 ```sh
 % ./test
@@ -421,12 +421,12 @@ DISTFILES=      scheme-microcode+dist-7.3-freebsd.tgz
 
 现在，如果我们进入该 Port 的目录并输入 `make`，会发生以下几件事：
 
-1. 系统检查此 Port 的源代码是否已经存在。
+1. 系统检查此 Port 的源代码是否存在。
 2. 如果不存在，将建立与 **MASTER_SITES** 中指定的 URL 的 FTP 连接来下载源代码。
 3. 系统计算源代码的校验和，并与已知的源代码校验和进行比较，确保源代码在传输过程中没有损坏。
 4. 应用所需的任何更改，使源代码能够在 FreeBSD 上正常工作——这称为 *patching*。
 5. 进行源代码所需的特殊配置。（许多 UNIX® 程序在编译时会试图找出它们运行的 UNIX® 版本和所支持的 UNIX® 特性——在 FreeBSD 的 Ports 系统中，这些信息会提供给源代码。）
-6. 编译程序的源代码。实际上，我们进入源代码解压的目录并执行 `make`——程序自己的 makefile 已包含构建程序所需的信息。
+6. 编译程序的源代码。实际上，我们进入源代码解压的目录并执行 `make`——程序自己的 makefile 包含构建程序所需的信息。
 7. 我们现在得到了编译好的程序。如果需要，可以进行测试；当我们确认程序正常工作时，可以输入 `make install`，这会将程序和任何需要的支持文件复制到正确的位置，并在包数据库中创建条目，以便以后如果改变主意，可以轻松卸载该 Port。
 
 现在你应该会同意，这个四行的脚本非常强大！
@@ -437,9 +437,9 @@ DISTFILES=      scheme-microcode+dist-7.3-freebsd.tgz
 
 ### 2.5.5. `make` 的高级用法
 
-`make` 是一个非常强大的工具，能做的事情远远超过上面简单示例所展示的内容。不幸的是，存在多种不同版本的 `make`，它们之间有很大差异。学习它们能做什么的最佳方式可能是阅读文档——希望本介绍已经为你提供了一个良好的基础。可以通过 [make(1)](https://man.freebsd.org/cgi/man.cgi?query=make&sektion=1&format=html) 手册页，了解更多关于变量、参数及如何使用 make 的全面讨论。
+`make` 是一个非常强大的工具，能做的事情远远超过上面简单示例所展示的内容。不幸的是，存在多种不同版本的 `make`，它们之间有很大差异。学习它们能做什么的最佳方式可能是阅读文档——希望本介绍为你提供了一个良好的基础。可以通过 [make(1)](https://man.freebsd.org/cgi/man.cgi?query=make&sektion=1&format=html) 手册页，了解更多关于变量、参数及如何使用 make 的全面讨论。
 
-许多 Ports 应用程序使用 GNU make，它提供了非常好的 “info” 页面。如果你已经安装了这些 Ports，GNU make 会自动安装为 `gmake`。它也可以作为一个独立的 Port 或包安装。
+许多 Ports 应用程序使用 GNU make，它提供了非常好的 “info” 页面。如果你安装了这些 Ports，GNU make 会自动安装为 `gmake`。它也可以作为一个独立的 Port 或包安装。
 
 要查看 GNU make 的 info 页面，你需要编辑 **/usr/local/info** 目录下的 **dir** 文件，添加一行：
 
@@ -628,7 +628,7 @@ Core file '/home/pauamma/tmp/progname.core' (x86_64) was loaded.
 
 ```sh
 (lldb) thread backtrace all
-​ thread #1, name = 'progname', stop reason = signal SIGSEGV
+* thread #1, name = 'progname', stop reason = signal SIGSEGV
    frame #0: 0x0000000000201347 progname`bazz(anint=5) at temp2.c:17:10
     frame #1: 0x0000000000201312 progname`main at temp2.c:10:2
     frame #2: 0x000000000020110f progname`_start(ap=<unavailable>, cleanup=<unavailable>) at crt1.c:76:7
@@ -639,7 +639,7 @@ Core file '/home/pauamma/tmp/progname.core' (x86_64) was loaded.
 
 #### 2.6.2.4. 使用 lldb 附加到正在运行的程序
 
-`lldb` 的一大亮点功能是它可以附加到一个已经在运行的程序上。当然，这要求有足够的权限才能执行此操作。一个常见问题是，在单步调试一个会 fork 的程序并希望跟踪子进程时，调试器通常只会跟踪父进程。
+`lldb` 的一大亮点功能是它可以附加到一个正在运行的程序上。当然，这要求有足够的权限才能执行此操作。一个常见问题是，在单步调试一个会 fork 的程序并希望跟踪子进程时，调试器通常只会跟踪父进程。
 
 为此，启动另一个 `lldb`，使用 `ps` 查找子进程的进程 ID，然后在 `lldb` 中执行
 
@@ -852,7 +852,7 @@ Cannot access memory at address 0x7020796d.
 
 #### 2.6.4.4. 使用 gdb 附加到正在运行的程序
 
-`gdb` 最出色的功能之一就是它可以附加到一个已经在运行的程序。当然，这需要足够的权限才能做到这一点。一个常见的问题是，在单步调试一个会 fork 的程序并希望跟踪子进程时，调试器只会跟踪父进程。
+`gdb` 最出色的功能之一就是它可以附加到一个正在运行的程序。当然，这需要足够的权限才能做到这一点。一个常见的问题是，在单步调试一个会 fork 的程序并希望跟踪子进程时，调试器只会跟踪父进程。
 
 为此，可以启动另一个 `gdb`，使用 `ps` 查找子进程的 PID，然后在 `gdb` 中执行：
 
@@ -884,7 +884,7 @@ else if (pid == 0) {		/* 子进程 */
 
 ### 2.7.1. Emacs
 
-Emacs 是一个高度可定制的编辑器——事实上，它已经被定制到更像一个操作系统而不是编辑器的程度！许多开发者和系统管理员确实几乎把所有的时间都花在 Emacs 中，只有在注销时才会离开它。
+Emacs 是一个高度可定制的编辑器——事实上，它被定制到更像一个操作系统而不是编辑器的程度！许多开发者和系统管理员确实几乎把所有的时间都花在 Emacs 中，只有在注销时才会离开它。
 
 在这里简要总结 Emacs 能做的所有事情几乎是不可能的，但以下是一些对开发者有用的功能：
 
@@ -923,7 +923,7 @@ Emacs 并没有使用专有的宏语言来进行配置，而是使用了一种�
 
 学习 Emacs Lisp 的最佳方式是阅读在线的 [Emacs Reference](https://www.gnu.org/software/emacs/manual/elisp.html) 手册。
 
-不过，实际上并不需要懂 Lisp 就可以开始配置 Emacs，因为我提供了一个示例 **.emacs** 文件，应该足以让你入门。只需将它复制到你的主目录中，并重新启动 Emacs（如果已经运行的话）；它会读取文件中的命令，并（希望）为你提供一个有用的基本设置。
+不过，实际上并不需要懂 Lisp 就可以开始配置 Emacs，因为我提供了一个示例 **.emacs** 文件，应该足以让你入门。只需将它复制到你的主目录中，并重新启动 Emacs（如果正在运行的话）；它会读取文件中的命令，并（希望）为你提供一个有用的基本设置。
 
 ### 2.7.3. 示例 **.emacs**
 
@@ -933,7 +933,7 @@ Emacs 并没有使用专有的宏语言来进行配置，而是使用了一种�
 * 在第一行，`-*- Emacs-Lisp -*-` 是为了使我们能够在 Emacs 内部编辑 **.emacs** 文件，并获得所有编辑 Emacs Lisp 的高级功能。Emacs 通常会根据文件名尝试猜测这一点，但可能不会为 **.emacs** 文件正确识别。
 * Tab 键在某些模式下绑定到缩进功能，因此当你按下 Tab 键时，它会缩进当前的代码行。如果你想在写的内容中插入一个 Tab 字符，可以在按 Tab 键时按住控制键。
 * 该文件支持 C、C++、Perl、Lisp 和 Scheme 的语法高亮，通过从文件名猜测语言来启用。
-* Emacs 已经有一个预定义的函数 `next-error`。在编译输出窗口中，它允许你通过执行 `M-n` 从一个编译错误跳到下一个；我们定义了一个互补函数 `previous-error`，允许你通过执行 `M-p` 跳转到前一个错误。最好的功能是，`C-c C-c` 会打开发生错误的源文件并跳转到相应的行。
+* Emacs 有一个预定义的函数 `next-error`。在编译输出窗口中，它允许你通过执行 `M-n` 从一个编译错误跳到下一个；我们定义了一个互补函数 `previous-error`，允许你通过执行 `M-p` 跳转到前一个错误。最好的功能是，`C-c C-c` 会打开发生错误的源文件并跳转到相应的行。
 * 我们启用 Emacs 的服务器功能，这样，如果你在 Emacs 之外做一些事情，想要编辑一个文件，只需输入
 
   ```sh
@@ -1233,7 +1233,7 @@ Emacs 并没有使用专有的宏语言来进行配置，而是使用了一种�
 
 ### 2.7.4. 扩展 Emacs 支持的语言范围
 
-如果你只想在 **.emacs** 中使用已经支持的语言（C、C++、Perl、Lisp 和 Scheme），那是很好，但如果有一种新的语言叫做 "whizbang" 出现，充满了激动人心的功能，该怎么办呢？
+如果你只想在 **.emacs** 中使用支持的语言（C、C++、Perl、Lisp 和 Scheme），那是很好，但如果有一种新的语言叫做 "whizbang" 出现，充满了激动人心的功能，该怎么办呢？
 
 首先要做的是查看 whizbang 是否附带了任何可以让 Emacs 了解该语言的文件。通常这些文件的扩展名是 **.el**，即 "Emacs Lisp" 的缩写。例如，如果 whizbang 是一个 FreeBSD Port，我们可以通过以下命令来查找这些文件：
 
