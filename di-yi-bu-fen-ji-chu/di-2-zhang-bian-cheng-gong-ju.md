@@ -76,7 +76,7 @@ Tcl 是一种可嵌入的解释型语言，因其良好的跨平台特性而得�
 
 显然，这种方式不像使用解释器那样直接。然而，它允许你做很多用解释器很难甚至不可能完成的事情，比如编写与操作系统密切交互的代码——甚至编写你自己的操作系统！如果你需要编写高效的代码，它也非常有用，因为编译器可以花时间优化代码，而这对解释器来说是不可接受的。此外，为编译器编写的程序通常比为解释器编写的程序更易于分发——你只需要给他们一个可执行文件副本，前提是他们使用的操作系统与你相同。
 
-由于使用单独程序进行编辑-编译-运行-调试的周期相当繁琐，许多商业编译器制造商开发了集成开发环境（简称 IDE）。FreeBSD 的基础系统中不包括 IDE，但 [devel/kdevelop](https://cgit.freebsd.org/ports/tree/devel/kdevelop/) 在 Ports Collection 中可以找到，许多人也使用 Emacs 来实现这个目的。关于如何使用 Emacs 作为 IDE，请参见 [Using Emacs as a Development Environment](https://docs.freebsd.org/en/books/developers-handbook/tools/#emacs)。
+由于使用单独程序进行编辑-编译-运行-调试的周期相当繁琐，许多商业编译器制造商开发了集成开发环境（简称 IDE）。FreeBSD 的基础系统中不包括 IDE，但 [devel/kdevelop](https://cgit.freebsd.org/ports/tree/devel/kdevelop/) 在 Ports Collection 中可以找到，许多人也使用 Emacs 来实现这个目的。关于如何使用 Emacs 作为 IDE，请参见 [使用 Emacs 作为开发环境](https://docs.freebsd.org/en/books/developers-handbook/tools/#emacs)。
 
 ## 2.4. 使用 `cc` 编译
 
@@ -465,7 +465,7 @@ FreeBSD 提供的标准调试器是 `lldb`（LLVM 调试器）。由于它是该
 
 FreeBSD 还提供了另一个调试器 `gdb`（GNU 调试器）。与 lldb 不同，`gdb` 并不是 FreeBSD 的默认安装，若要使用它，请从 Ports 或 Packages 中安装 [devel/gdb](https://cgit.freebsd.org/ports/tree/devel/gdb/)。它提供了很好的在线帮助和一套 info 页面。
 
-这两个调试器具有相似的功能集，因此选择使用哪个调试器很大程度上取决于个人喜好。如果只熟悉其中一个，可以使用该调试器。如果对两者都不熟悉，或者都熟悉但希望在 Emacs 中使用其中一个，应该选择 `gdb`，因为 `lldb` 不支持 Emacs。否则，尝试两者并看看哪个更适合自己。
+这两个调试器具有相似的功能集，因此选择使用哪个调试器很大程度上取决于个人喜好。如果只熟悉其中一个，可以使用该调试器。如果对两者都不熟悉，或者都熟悉但希望在 Emacs 中使用其中一个，应该选择 `gdb`，因为 Emacs 不支持 `lldb`。否则，尝试两者并看看哪个更适合自己。
 
 ### 2.6.2. 使用 lldb
 
