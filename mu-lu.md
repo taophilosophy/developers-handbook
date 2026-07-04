@@ -1,4 +1,4 @@
-# Table of contents
+# 目录
 
 * [FreeBSD 开发者手册](README.md)
 
