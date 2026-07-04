@@ -1,10 +1,9 @@
 # developers-handbook
 
->**警告**
->
->除已校对部分外，本项目目前翻译错漏百出，不适合用于生产。
->
->本项目目前处于低维护状态，主要维护者因精力所限仅处理 PR。欢迎社区通过 PR 贡献力量。
-
+本书已经过重分校对和审阅。
 
 面向希望为 FreeBSD 开发软件的人（而不仅仅是那些开发 FreeBSD 操作系统本体的人）
+
+FreeBSD Developers' Handbook，项目原文：<https://docs.freebsd.org/en/books/developers-handbook/>
+
+FreeBSD 中文社区（CFC）译制。本项目采用 2 条款 BSD 许可。
